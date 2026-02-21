@@ -1,0 +1,2 @@
+recursive-include csrc *.c *.h
+recursive-include src *.py
