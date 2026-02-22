@@ -38,10 +38,13 @@ typedef struct {
   geo_llh_t llh_cache;
   geo_utm_t utm_cache;
   char mgrs_cache[32];
+  char geohash_cache[16];
   int mgrs_precision;
+  int geohash_precision;
   unsigned int has_llh_cache;
   unsigned int has_utm_cache;
   unsigned int has_mgrs_cache;
+  unsigned int has_geohash_cache;
 } geo_point_t;
 
 #endif
