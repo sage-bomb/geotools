@@ -60,7 +60,7 @@ class GeoMGRS(Structure):
         ("hemi", c_char),
     ]
 
-# ----------------- Status codes (must match geo_wgs84.h) -----------------
+# ----------------- Status codes (must match include/geo/geo.h) -----------------
 GEO_OK = 0
 GEO_ERR_RANGE = 1
 GEO_ERR_PARSE = 2

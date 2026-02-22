@@ -1,7 +1,7 @@
 #ifndef GEO_INTERNAL_H
 #define GEO_INTERNAL_H
 
-#include "geo_wgs84.h"
+#include "geo/geo.h"
 
 #include <stddef.h>
 
