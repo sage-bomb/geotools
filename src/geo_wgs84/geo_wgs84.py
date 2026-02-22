@@ -191,11 +191,25 @@ def ecef_to_utm(x: float, y: float, z: float) -> dict:
         "northing": float(out.northing),
     }
 
+
+
+def _call_with_growing_buffer(call, initial_size: int = 64, max_size: int = 4096) -> str:
+    size = max(8, int(initial_size))
+    while size <= max_size:
+        buf = ctypes.create_string_buffer(size)
+        status = call(buf, ctypes.sizeof(buf))
+        if status == GEO_OK:
+            return buf.value.decode("ascii")
+        if status != GEO_ERR_BUFFER_TOO_SMALL:
+            _check(status)
+        size *= 2
+    raise GeoError(GEO_ERR_BUFFER_TOO_SMALL, "buffer growth limit exceeded")
+
 def ll_to_mgrs(lat_deg: float, lon_deg: float, precision: int = 5, buf_sz: int = 64) -> str:
-    buf = ctypes.create_string_buffer(buf_sz)
-    status = _lib.geo_ll_to_mgrs_wgs84(lat_deg, lon_deg, int(precision), buf, ctypes.sizeof(buf))
-    _check(status, "geo_ll_to_mgrs_wgs84 failed")
-    return buf.value.decode("ascii")
+    return _call_with_growing_buffer(
+        lambda buf, sz: _lib.geo_ll_to_mgrs_wgs84(lat_deg, lon_deg, int(precision), buf, sz),
+        initial_size=buf_sz,
+    )
 
 def mgrs_to_ll(mgrs: str) -> tuple[float, float]:
     out = GeoLLH()
@@ -211,10 +225,10 @@ def mgrs_to_ecef(mgrs: str, h_m: float = 0.0) -> tuple[float, float, float]:
 
 def ecef_to_mgrs(x: float, y: float, z: float, precision: int = 5, buf_sz: int = 64) -> str:
     e = GeoECEF(float(x), float(y), float(z))
-    buf = ctypes.create_string_buffer(buf_sz)
-    status = _lib.geo_ecef_to_mgrs_wgs84(ctypes.byref(e), int(precision), buf, ctypes.sizeof(buf))
-    _check(status, "geo_ecef_to_mgrs_wgs84 failed")
-    return buf.value.decode("ascii")
+    return _call_with_growing_buffer(
+        lambda buf, sz: _lib.geo_ecef_to_mgrs_wgs84(ctypes.byref(e), int(precision), buf, sz),
+        initial_size=buf_sz,
+    )
 
 def mgrs_parse(mgrs: str) -> dict:
     m = GeoMGRS()

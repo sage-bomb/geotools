@@ -4,10 +4,16 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+import pytest
+
+pyproj = pytest.importorskip("pyproj")
+mgrs_mod = pytest.importorskip("mgrs")
+
 from pyproj import CRS, Transformer
 import mgrs
 
 import geo_wgs84 as g
+
 
 m = mgrs.MGRS()
 
@@ -53,6 +59,34 @@ def get_field(obj, *names):
         if hasattr(obj, n):
             return getattr(obj, n)
     return None
+
+@pytest.mark.parametrize("c", CASES, ids=lambda c: c.name)
+def test_utm_mgrs_against_refs(c):
+    utm = g.ll_to_utm(c.lat, c.lon)
+    mgrs_str = g.ll_to_mgrs(c.lat, c.lon, 5)
+
+    zone = get_field(utm, "zone")
+    hemi = get_field(utm, "hemi", "hemisphere")
+    easting = get_field(utm, "easting")
+    northing = get_field(utm, "northing")
+    assert zone is not None and easting is not None and northing is not None, f"Unexpected GeoUTM shape: {utm!r}"
+
+    zone = int(zone)
+    easting = float(easting)
+    northing = float(northing)
+
+    tr = Transformer.from_crs(CRS.from_epsg(4326), utm_crs_from_zone(zone, c.lat), always_xy=True)
+    e_ref, n_ref = tr.transform(c.lon, c.lat)
+
+    # keep your tolerances exactly as before (copy from your script)
+    de = easting - float(e_ref)
+    dn = northing - float(n_ref)
+    assert abs(de) < 1e-3, f"{c.name}: easting mismatch {de} m"
+    assert abs(dn) < 1e-3, f"{c.name}: northing mismatch {dn} m"
+
+    # MGRS reference compare (copy your existing logic)
+    mgrs_ref = normalize_mgrs(m.toMGRS(c.lat, c.lon, MGRSPrecision=5))
+    assert normalize_mgrs(mgrs_str) == mgrs_ref, f"{c.name}: MGRS mismatch {mgrs_str} vs {mgrs_ref}"
 
 def main():
     ok = True
