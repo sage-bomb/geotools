@@ -63,3 +63,18 @@ The library includes a cached `GeoPoint` data model with ECEF as source of truth
 
 
 WGS84 remains the baseline datum/ellipsoid for all current calculations; datum transform support may be added in a future iteration.
+
+
+## GeoPolygon / GeoMultiPolygon (Python API)
+
+The Python layer now includes `GeoPointData`, `GeoPolygon`, and `GeoMultiPolygon` data models
+(using GeoPoint semantics as the core primitive).
+
+Supported now via C-backed APIs (with Python wrappers):
+- GeoJSON parsing via `parse_geojson` (`Point`, `Polygon`, `MultiPolygon`, `Feature`, `FeatureCollection`) is implemented in Python.
+- Polygon and multipolygon area calculation (`area_m2`) is implemented in C.
+- Point-in-polygon queries and nearest-edge distance + nearest edge point reporting are implemented in C.
+- Optional reporting of the nearest two defined polygon vertices is implemented in C.
+- Boolean polygon operations (`union`, `intersection`, `difference`, `xor`, `not`) are implemented in C for convex polygon workflows (`GeoPolygon` inputs).
+
+Note: Current C boolean operations are convex-polygon focused; overlapping `difference` / `xor` edge-cases may return `GEO_ERR_UNSUPPORTED`.

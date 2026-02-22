@@ -5,8 +5,10 @@
 #include "geo/ecef.h"
 #include "geo/utm.h"
 #include "geo/mgrs.h"
+#include "geo/geohash.h"
 #include "geo/compose.h"
 #include "geo/point.h"
+#include "geo/polygon.h"
 
 #define GEO_WGS84_VERSION_MAJOR 1
 #define GEO_WGS84_VERSION_MINOR 0

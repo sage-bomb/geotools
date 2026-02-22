@@ -68,3 +68,22 @@ def test_bulk_distances_from_points():
     assert len(ds) == 2
     assert len(dg) == 2
     assert dg[0] > ds[0]
+
+
+def test_point_geohash_lazy_cache_and_bidirectional_updates():
+    import geotools as g
+
+    p = g.Point(lat_deg=40.0, lon_deg=-74.0)
+    gh = p.get_geohash(precision=12)
+    assert isinstance(gh, str) and len(gh) == 12
+
+    p.set_geohash("dr5regw3ppyz")
+    lat, lon, h = p.llh
+    assert abs(lat) <= 90.0
+    assert abs(lon) <= 180.0
+    assert math.isclose(h, 0.0, abs_tol=1e-9)
+
+    ecef_before = p.ecef
+    p.set_geohash("dr5regw3ppyx")
+    ecef_after = p.ecef
+    assert ecef_after != ecef_before

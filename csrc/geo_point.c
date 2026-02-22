@@ -6,8 +6,11 @@ static void point_clear_lazy_caches(geo_point_t* p) {
     p->has_llh_cache = 0u;
     p->has_utm_cache = 0u;
     p->has_mgrs_cache = 0u;
+    p->has_geohash_cache = 0u;
     p->mgrs_cache[0] = '\0';
+    p->geohash_cache[0] = '\0';
     p->mgrs_precision = -1;
+    p->geohash_precision = -1;
 }
 
 static geo_status_t point_ensure_llh(geo_point_t* p) {
@@ -70,6 +73,20 @@ geo_status_t geo_point_init_from_mgrs_wgs84(geo_point_t* p, const char* mgrs_str
     return GEO_OK;
 }
 
+
+geo_status_t geo_point_init_from_geohash_wgs84(geo_point_t* p, const char* geohash, double h_m) {
+    geo_status_t st;
+    if (!p || !geohash) return GEO_ERR_PARSE;
+    st = geo_geohash_to_ecef_impl(geohash, h_m, &p->ecef);
+    if (st != GEO_OK) return st;
+    point_clear_lazy_caches(p);
+    strncpy(p->geohash_cache, geohash, sizeof(p->geohash_cache) - 1u);
+    p->geohash_cache[sizeof(p->geohash_cache) - 1u] = '\0';
+    p->has_geohash_cache = 1u;
+    p->geohash_precision = (int)strlen(p->geohash_cache);
+    return GEO_OK;
+}
+
 geo_status_t geo_point_set_ecef(geo_point_t* p, const geo_ecef_t* ecef) {
     return geo_point_init_from_ecef(p, ecef);
 }
@@ -81,6 +98,9 @@ geo_status_t geo_point_set_utm_wgs84(geo_point_t* p, const geo_utm_t* utm, doubl
 }
 geo_status_t geo_point_set_mgrs_wgs84(geo_point_t* p, const char* mgrs_str, double h_m) {
     return geo_point_init_from_mgrs_wgs84(p, mgrs_str, h_m);
+}
+geo_status_t geo_point_set_geohash_wgs84(geo_point_t* p, const char* geohash, double h_m) {
+    return geo_point_init_from_geohash_wgs84(p, geohash, h_m);
 }
 
 geo_status_t geo_point_get_ecef(const geo_point_t* p, geo_ecef_t* out) {
@@ -126,6 +146,29 @@ geo_status_t geo_point_get_mgrs_wgs84(geo_point_t* p, int precision, char* out, 
 
     if (strlen(p->mgrs_cache) + 1u > out_sz) return GEO_ERR_BUFFER_TOO_SMALL;
     strcpy(out, p->mgrs_cache);
+    return GEO_OK;
+}
+
+
+geo_status_t geo_point_get_geohash_wgs84(geo_point_t* p, int precision, char* out, size_t out_sz) {
+    geo_status_t st;
+    if (!p || !out || out_sz == 0u) return GEO_ERR_PARSE;
+    if (precision < 1 || precision > 15) return GEO_ERR_RANGE;
+
+    if (p->has_geohash_cache && p->geohash_precision == precision) {
+        size_t n = strlen(p->geohash_cache);
+        if (n + 1u > out_sz) return GEO_ERR_BUFFER_TOO_SMALL;
+        memcpy(out, p->geohash_cache, n + 1u);
+        return GEO_OK;
+    }
+
+    st = geo_ecef_to_geohash_impl(&p->ecef, precision, p->geohash_cache, sizeof(p->geohash_cache));
+    if (st != GEO_OK) return st;
+    p->has_geohash_cache = 1u;
+    p->geohash_precision = precision;
+
+    if (strlen(p->geohash_cache) + 1u > out_sz) return GEO_ERR_BUFFER_TOO_SMALL;
+    strcpy(out, p->geohash_cache);
     return GEO_OK;
 }
 
