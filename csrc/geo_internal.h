@@ -42,4 +42,8 @@ geo_status_t geo_ecef_to_utm_impl(const geo_ecef_t* ecef, geo_utm_t* out);
 geo_status_t geo_mgrs_to_ecef_impl(const char* mgrs_str, double h_m, geo_ecef_t* out_ecef);
 geo_status_t geo_ecef_to_mgrs_impl(const geo_ecef_t* ecef, int precision, char* out, size_t out_sz);
 
+geo_status_t geo_ecef_distance_surface_impl_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
+geo_status_t geo_ecef_distance_surface_with_elevation_impl_wgs84(const geo_ecef_t* a, const geo_ecef_t* b,
+                                                                  double* out_m);
+
 #endif

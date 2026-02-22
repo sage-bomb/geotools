@@ -79,10 +79,3 @@ geo_status_t geo_ecef_distance_m(const geo_ecef_t* a, const geo_ecef_t* b, doubl
     *out_m = sqrt(dx * dx + dy * dy + dz * dz);
     return GEO_OK;
 }
-
-geo_status_t geo_llh_distance_surface_m_wgs84(const geo_llh_t* a, const geo_llh_t* b, double* out_m) {
-    (void)a;
-    (void)b;
-    (void)out_m;
-    return GEO_ERR_UNSUPPORTED;
-}

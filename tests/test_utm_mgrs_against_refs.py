@@ -12,7 +12,7 @@ mgrs_mod = pytest.importorskip("mgrs")
 from pyproj import CRS, Transformer
 import mgrs
 
-import geo_wgs84 as g
+import geotools as g
 
 
 m = mgrs.MGRS()

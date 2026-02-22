@@ -80,3 +80,15 @@ geo_status_t geo_ecef_to_mgrs_wgs84(const geo_ecef_t* ecef, int precision,
     if (precision < 0 || precision > 5) return GEO_ERR_RANGE;
     return geo_ecef_to_mgrs_impl(ecef, precision, out_str, out_sz);
 }
+
+
+geo_status_t geo_ecef_distance_surface_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m) {
+    if (!a || !b || !out_m) return GEO_ERR_PARSE;
+    return geo_ecef_distance_surface_impl_wgs84(a, b, out_m);
+}
+
+geo_status_t geo_ecef_distance_surface_with_elevation_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b,
+                                                               double* out_m) {
+    if (!a || !b || !out_m) return GEO_ERR_PARSE;
+    return geo_ecef_distance_surface_with_elevation_impl_wgs84(a, b, out_m);
+}

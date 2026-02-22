@@ -14,11 +14,11 @@ def _shared_lib_name() -> str:
     # Your wrapper currently expects .so. If you ever want macOS wheels,
     # you can change your wrapper to accept .dylib too.
     if sys.platform == "darwin":
-        return "libgeo_wgs84.dylib"
+        return "libgeotools.dylib"
     elif os.name == "nt":
-        return "geo_wgs84.dll"
+        return "geotools.dll"
     else:
-        return "libgeo_wgs84.so"
+        return "libgeotools.so"
 
 
 def _build_shared(c_files: list[Path], out_path: Path, include_dirs: list[Path]) -> None:
@@ -61,22 +61,22 @@ class build_py(_build_py):
         so_name = _shared_lib_name()
 
         # 1) normal build output (wheel/non-editable)
-        out1 = Path(self.build_lib) / "geo_wgs84" / so_name
+        out1 = Path(self.build_lib) / "geotools" / so_name
         _build_shared(c_files, out1, include_dirs)
 
         # 2) in-place build for editable installs
-        out2 = repo / "src" / "geo_wgs84" / so_name
+        out2 = repo / "src" / "geotools" / so_name
         _build_shared(c_files, out2, include_dirs)
 
 
 setup(
-    name="geo-wgs84",
+    name="geotools",
     version="0.1.0",
     description="WGS84 coordinate conversion (C library + Python wrapper)",
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     include_package_data=True,
-    package_data={"geo_wgs84": [_shared_lib_name()]},
+    package_data={"geotools": [_shared_lib_name()]},
     extras_require={
         "test": ["pytest", "pyproj", "mgrs"],
     },
