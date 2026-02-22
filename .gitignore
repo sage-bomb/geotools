@@ -1,0 +1,60 @@
+# ----------------------------
+# Python / packaging
+# ----------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Packaging/build metadata
+*.egg-info/
+.eggs/
+dist/
+build/
+pip-wheel-metadata/
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# ----------------------------
+# Native build artifacts
+# ----------------------------
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.obj
+*.pdb
+*.lib
+
+# Your editable-install in-place native lib output
+src/geo_wgs84/libgeo_wgs84.so
+src/geo_wgs84/libgeo_wgs84.dylib
+src/geo_wgs84/geo_wgs84.dll
+
+# (Optional) ignore any future native libs in that package dir
+# src/geo_wgs84/*.so
+# src/geo_wgs84/*.dylib
+# src/geo_wgs84/*.dll
+
+# ----------------------------
+# OS / editor junk
+# ----------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
