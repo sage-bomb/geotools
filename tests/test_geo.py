@@ -24,6 +24,8 @@ import sys
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
+from pathlib import Path
+import pytest
 
 # ----------------------------
 # Helpers
@@ -268,6 +270,42 @@ def print_report(results: List[CheckResult], top_n: int = 10) -> int:
             print(f"  ... and {len(failed)-50} more")
 
     return 0 if not failed else 1
+
+
+# ----------------------------
+# Pytest entrypoints
+# ----------------------------
+
+_TESTDATA = Path(__file__).parent / "testdata"
+
+@pytest.mark.parametrize("csv_name", [
+    "geoconv_test_points_wgs84_geo_ecef.csv",
+    "geoconv_edge_points_wgs84_geo_ecef.csv",
+])
+def test_geo_roundtrip_csv(csv_name):
+    csv_path = _TESTDATA / csv_name
+    assert csv_path.exists(), f"Missing test data: {csv_path}"
+
+    rows = read_rows(str(csv_path))
+
+    # Use wrapper default loading behavior; do not rely on CLI args here.
+    llh_to_ecef, ecef_to_llh = load_geo_api(lib_path=None)
+
+    failures = verify(
+        rows,
+        llh_to_ecef=llh_to_ecef,
+        ecef_to_llh=ecef_to_llh,
+        ecef_abs_tol_m=1e-3,
+        ecef_rel_tol=0.0,
+        lat_tol_deg=1e-9,
+        lon_tol_deg=1e-9,
+        h_tol_m=1e-3,
+    )
+
+    # verify() returns a list of failure records (empty list means pass)
+    assert isinstance(failures, list), f"verify() returned unexpected type: {type(failures)}"
+    bad = [r for r in failures if not getattr(r, "ok", False)]
+    assert len(bad) == 0, f"{len(bad)} failures; first: {bad[0] if bad else None}"
 
 
 def main():
