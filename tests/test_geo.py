@@ -20,12 +20,36 @@ import argparse
 import csv
 import math
 import os
+import subprocess
 import sys
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
 from pathlib import Path
 import pytest
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = REPO_ROOT / "src"
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
+
+
+def build_shared_library() -> Path:
+    so_name = "libgeo_wgs84.dylib" if sys.platform == "darwin" else "libgeo_wgs84.so"
+    out_path = SRC_ROOT / "geo_wgs84" / so_name
+    c_files = sorted((REPO_ROOT / "csrc").glob("*.c"))
+    include_dirs = [REPO_ROOT / "csrc", REPO_ROOT / "include"]
+    cmd = ["cc", "-O2", "-fPIC"]
+    if sys.platform == "darwin":
+        cmd += ["-dynamiclib"]
+    else:
+        cmd += ["-shared"]
+    cmd += [f"-I{inc}" for inc in include_dirs]
+    cmd += [str(c) for c in c_files]
+    cmd += ["-o", str(out_path), "-lm"]
+    subprocess.check_call(cmd)
+    return out_path
+
 
 # ----------------------------
 # Helpers
@@ -69,9 +93,8 @@ def load_geo_api(lib_path: Optional[str]):
     """
     # Try common import paths
     candidates = [
-        "geotool.geo_wgs84",
-        "geotool",
         "geo_wgs84",
+        "geo_wgs84.geo_wgs84",
     ]
 
     last_err = None
@@ -278,13 +301,17 @@ def print_report(results: List[CheckResult], top_n: int = 10) -> int:
 
 _TESTDATA = Path(__file__).parent / "testdata"
 
-@pytest.mark.parametrize("csv_name", [
-    "geoconv_test_points_wgs84_geo_ecef.csv",
-    "geoconv_edge_points_wgs84_geo_ecef.csv",
-])
-def test_geo_roundtrip_csv(csv_name):
-    csv_path = _TESTDATA / csv_name
-    assert csv_path.exists(), f"Missing test data: {csv_path}"
+CSV_FIXTURES = sorted(_TESTDATA.glob("*.csv"))
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _build_lib_for_tests():
+    build_shared_library()
+
+
+@pytest.mark.parametrize("csv_path", CSV_FIXTURES, ids=lambda p: p.name)
+def test_geo_roundtrip_csv(csv_path: Path):
+    assert CSV_FIXTURES, f"No CSV fixtures found in {_TESTDATA}"
 
     rows = read_rows(str(csv_path))
 
