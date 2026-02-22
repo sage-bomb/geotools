@@ -21,7 +21,7 @@ def _shared_lib_name() -> str:
         return "libgeo_wgs84.so"
 
 
-def _build_shared(c_file: Path, out_path: Path) -> None:
+def _build_shared(c_files: list[Path], out_path: Path, include_dirs: list[Path]) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     if os.name == "nt":
@@ -31,11 +31,12 @@ def _build_shared(c_file: Path, out_path: Path) -> None:
         )
 
     # Linux / macOS
-    cmd = ["cc", "-O2", "-fPIC", "-shared", str(c_file), "-o", str(out_path), "-lm"]
+    include_flags = [f"-I{inc}" for inc in include_dirs]
+    sources = [str(c) for c in c_files]
+    cmd = ["cc", "-O2", "-fPIC", "-shared", *include_flags, *sources, "-o", str(out_path), "-lm"]
 
-    # macOS: -shared isn't always what you want; clang typically uses -dynamiclib
     if sys.platform == "darwin":
-        cmd = ["cc", "-O2", "-fPIC", "-dynamiclib", str(c_file), "-o", str(out_path), "-lm"]
+        cmd = ["cc", "-O2", "-fPIC", "-dynamiclib", *include_flags, *sources, "-o", str(out_path), "-lm"]
 
     print("Building native library:", " ".join(cmd))
     subprocess.check_call(cmd)
@@ -52,19 +53,20 @@ class build_py(_build_py):
         super().run()
 
         repo = Path(__file__).resolve().parent
-        c_file = repo / "csrc" / "geo_wgs84.c"
-        if not c_file.exists():
-            raise FileNotFoundError(f"Missing C source file: {c_file}")
+        c_files = sorted((repo / "csrc").glob("*.c"))
+        if not c_files:
+            raise FileNotFoundError("Missing C source files under csrc/")
+        include_dirs = [repo / "csrc", repo / "include"]
 
         so_name = _shared_lib_name()
 
         # 1) normal build output (wheel/non-editable)
         out1 = Path(self.build_lib) / "geo_wgs84" / so_name
-        _build_shared(c_file, out1)
+        _build_shared(c_files, out1, include_dirs)
 
         # 2) in-place build for editable installs
         out2 = repo / "src" / "geo_wgs84" / so_name
-        _build_shared(c_file, out2)
+        _build_shared(c_files, out2, include_dirs)
 
 
 setup(
@@ -75,5 +77,8 @@ setup(
     packages=find_packages(where="src"),
     include_package_data=True,
     package_data={"geo_wgs84": [_shared_lib_name()]},
+    extras_require={
+        "test": ["pytest", "pyproj", "mgrs"],
+    },
     cmdclass={"build_py": build_py},
 )
