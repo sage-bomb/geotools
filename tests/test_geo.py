@@ -4,7 +4,7 @@ verify_geotool_points.py
 
 Usage:
   python verify_geotool_points.py path/to/test_points.csv
-  python verify_geotool_points.py path/to/test_points.csv --lib ./geotool/csrc/libgeo_wgs84.so
+  python verify_geotool_points.py path/to/test_points.csv --lib ./geotool/csrc/libgeotools.so
 
 What it checks:
   1) LLH -> ECEF matches expected ecef_{x,y,z}_m within tolerances
@@ -35,8 +35,8 @@ if str(SRC_ROOT) not in sys.path:
 
 
 def build_shared_library() -> Path:
-    so_name = "libgeo_wgs84.dylib" if sys.platform == "darwin" else "libgeo_wgs84.so"
-    out_path = SRC_ROOT / "geo_wgs84" / so_name
+    so_name = "libgeotools.dylib" if sys.platform == "darwin" else "libgeotools.so"
+    out_path = SRC_ROOT / "geotools" / so_name
     c_files = sorted((REPO_ROOT / "csrc").glob("*.c"))
     include_dirs = [REPO_ROOT / "csrc", REPO_ROOT / "include"]
     cmd = ["cc", "-O2", "-fPIC"]
@@ -93,8 +93,8 @@ def load_geo_api(lib_path: Optional[str]):
     """
     # Try common import paths
     candidates = [
-        "geo_wgs84",
-        "geo_wgs84.geo_wgs84",
+        "geotools",
+        "geotools.geotools",
     ]
 
     last_err = None
@@ -338,7 +338,7 @@ def test_geo_roundtrip_csv(csv_path: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("csv", help="CSV with columns id,lat_deg,lon_deg,h_m,ecef_x_m,ecef_y_m,ecef_z_m")
-    ap.add_argument("--lib", help="Optional path to libgeo_wgs84.so (if your wrapper can be pointed at it)", default=None)
+    ap.add_argument("--lib", help="Optional path to libgeotools.so (if your wrapper can be pointed at it)", default=None)
 
     # Tolerances
     ap.add_argument("--ecef-abs-tol-m", type=float, default=1e-3, help="Absolute ECEF error tolerance (meters)")
