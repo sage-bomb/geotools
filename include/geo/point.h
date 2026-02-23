@@ -6,6 +6,10 @@
 
 #define GEO_MGRS_MAX_STR_LEN 32
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 GEO_API geo_status_t geo_point_init_from_ecef(geo_point_t* p, const geo_ecef_t* ecef);
 GEO_API geo_status_t geo_point_init_from_llh_wgs84(geo_point_t* p, const geo_llh_t* llh);
 GEO_API geo_status_t geo_point_init_from_utm_wgs84(geo_point_t* p, const geo_utm_t* utm, double h_m);
@@ -31,5 +35,9 @@ GEO_API geo_status_t geo_point_distance_surface_with_elevation_m_wgs84(geo_point
 GEO_API geo_status_t geo_points_distance_straight_m(const geo_point_t* a, const geo_point_t* b, size_t n, double* out_m);
 GEO_API geo_status_t geo_points_distance_surface_m_wgs84(geo_point_t* a, geo_point_t* b, size_t n, double* out_m);
 GEO_API geo_status_t geo_points_distance_surface_with_elevation_m_wgs84(geo_point_t* a, geo_point_t* b, size_t n, double* out_m);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
