@@ -2,6 +2,11 @@
 
 C + Python (ctypes) WGS84 geospatial conversion library.
 
+
+## Project roadmap
+
+- See `docs/UNIVERSAL_GEOTOOLS_ROADMAP.md` for a staged plan to expand geotools into a multi-language, high-performance geospatial and geopositioning platform.
+
 ## Prerequisites
 
 - Python 3.9+
@@ -39,6 +44,40 @@ Notes:
 - `tests/test_geo.py` uses local CSV reference data in `tests/testdata/` (no network access needed at test runtime).
 - `tests/test_utm_mgrs_against_refs.py` validates against PROJ/MGRS references and therefore needs `pyproj` + `mgrs`, included via `.[test]`.
 
+
+
+## Imagery tie-point geopositioning (Phase 2)
+
+The C and Python APIs now include an affine tie-point workflow:
+
+- Fit pixel-to-LLH affine model from common tie points.
+- Project image pixel coordinates into WGS84 LLH with the fitted model.
+- Return fit quality metrics (`rmse_m`, inlier/total counts).
+
+See Python entry points:
+- `imagery_fit_affine_tie_points_wgs84`
+- `imagery_project_pixel_wgs84`
+- `imagery_solve_tie_points_wgs84` (backward-compatible stats-only entrypoint)
+
+
+## C++ API (Phase 3)
+
+Header-only C++ wrappers are available under `include/geo_cpp/`:
+
+- `geo_cpp/point.hpp` (`geo::Point`)
+- `geo_cpp/crs.hpp` (`geo::CRS`)
+- `geo_cpp/imagery.hpp` (`geo::TiePointAffineModel`)
+- `geo_cpp/geotools.hpp` umbrella include
+
+These wrap the stable C ABI and throw `geo::GeoError` on non-`GEO_OK` results.
+
+## Microservice example (Phase 4)
+
+A simple FastAPI reference service is provided in `examples/microservice/` with conversion, imagery tie-point endpoints, and a verification endpoint:
+
+- `POST /verify/roundtrip` for release/build validation checks over REST.
+
+See `examples/microservice/README.md` for run instructions.
 
 ## Distance measurements
 

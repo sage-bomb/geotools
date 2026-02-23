@@ -59,6 +59,46 @@ class GeoMGRS(Structure):
         ("northing", c_double),
         ("hemi", c_char),
     ]
+
+class GeoGeodesicInverseResult(Structure):
+    _fields_ = [
+        ("distance_m", c_double),
+        ("initial_bearing_deg", c_double),
+        ("final_bearing_deg", c_double),
+    ]
+
+class GeoCRS(Structure):
+    _fields_ = [
+        ("epsg", c_int),
+        ("kind", c_int),
+        ("name", c_char * 32),
+    ]
+
+
+class GeoTiePoint(Structure):
+    _fields_ = [
+        ("image_px", c_double),
+        ("image_py", c_double),
+        ("world_llh", GeoLLH),
+        ("sigma_px", c_double),
+        ("sigma_m", c_double),
+    ]
+
+class GeoTiePointAffineModel(Structure):
+    _fields_ = [
+        ("lat_coeff", c_double * 3),
+        ("lon_coeff", c_double * 3),
+        ("h_coeff", c_double * 3),
+    ]
+
+class GeoTiePointFitStats(Structure):
+    _fields_ = [
+        ("inlier_count", c_size_t),
+        ("total_count", c_size_t),
+        ("rmse_px", c_double),
+        ("rmse_m", c_double),
+    ]
+
 class GeoPoint(Structure):
     _fields_ = [
         ("ecef", GeoECEF),
@@ -233,6 +273,34 @@ _lib.geo_points_distance_surface_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(
 _lib.geo_points_distance_surface_m_wgs84.restype  = c_int
 _lib.geo_points_distance_surface_with_elevation_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), c_size_t, POINTER(c_double)]
 _lib.geo_points_distance_surface_with_elevation_m_wgs84.restype  = c_int
+
+
+# geodesy + CRS
+_lib.geo_llh_geodesic_inverse_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), POINTER(GeoGeodesicInverseResult)]
+_lib.geo_llh_geodesic_inverse_wgs84.restype  = c_int
+
+_lib.geo_llh_geodesic_direct_wgs84.argtypes = [POINTER(GeoLLH), c_double, c_double, POINTER(GeoLLH)]
+_lib.geo_llh_geodesic_direct_wgs84.restype  = c_int
+
+_lib.geo_llh_geodesic_interpolate_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), c_double, POINTER(GeoLLH)]
+_lib.geo_llh_geodesic_interpolate_wgs84.restype  = c_int
+
+_lib.geo_crs_from_epsg.argtypes = [c_int, POINTER(GeoCRS)]
+_lib.geo_crs_from_epsg.restype  = c_int
+
+_lib.geo_crs_normalize_epsg.argtypes = [c_int, POINTER(c_int)]
+_lib.geo_crs_normalize_epsg.restype  = c_int
+
+
+# imagery tie-point geopositioning
+_lib.geo_imagery_fit_affine_tie_points_wgs84.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointAffineModel), POINTER(GeoTiePointFitStats)]
+_lib.geo_imagery_fit_affine_tie_points_wgs84.restype  = c_int
+
+_lib.geo_imagery_project_pixel_wgs84.argtypes = [POINTER(GeoTiePointAffineModel), c_double, c_double, POINTER(GeoLLH)]
+_lib.geo_imagery_project_pixel_wgs84.restype  = c_int
+
+_lib.geo_imagery_solve_tie_points_wgs84.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointFitStats)]
+_lib.geo_imagery_solve_tie_points_wgs84.restype  = c_int
 
 # ----------------- Pythonic wrappers -----------------
 def llh_to_ecef(lat_deg: float, lon_deg: float, h_m: float = 0.0) -> tuple[float, float, float]:
@@ -767,3 +835,107 @@ def parse_geojson(data: str | dict[str, Any]) -> GeoPointData | GeoPolygon | Geo
     if t == 'Feature': return parse_geometry(payload['geometry'])
     if t == 'FeatureCollection': return [parse_geometry(f['geometry']) for f in payload.get('features', [])]
     raise ValueError(f'Unsupported GeoJSON payload type: {t!r}')
+
+def geodesic_inverse_wgs84(a_lat_deg: float, a_lon_deg: float, b_lat_deg: float, b_lon_deg: float) -> dict:
+    a = GeoLLH(a_lat_deg, a_lon_deg, 0.0)
+    b = GeoLLH(b_lat_deg, b_lon_deg, 0.0)
+    out = GeoGeodesicInverseResult()
+    _check(_lib.geo_llh_geodesic_inverse_wgs84(ctypes.byref(a), ctypes.byref(b), ctypes.byref(out)),
+           "geo_llh_geodesic_inverse_wgs84 failed")
+    return {
+        "distance_m": float(out.distance_m),
+        "initial_bearing_deg": float(out.initial_bearing_deg),
+        "final_bearing_deg": float(out.final_bearing_deg),
+    }
+
+def geodesic_direct_wgs84(lat_deg: float, lon_deg: float, initial_bearing_deg: float, distance_m: float, h_m: float = 0.0) -> tuple[float, float, float]:
+    start = GeoLLH(lat_deg, lon_deg, h_m)
+    out = GeoLLH()
+    _check(_lib.geo_llh_geodesic_direct_wgs84(ctypes.byref(start), initial_bearing_deg, distance_m, ctypes.byref(out)),
+           "geo_llh_geodesic_direct_wgs84 failed")
+    return (out.lat_deg, out.lon_deg, out.h_m)
+
+def geodesic_interpolate_wgs84(a_lat_deg: float, a_lon_deg: float, b_lat_deg: float, b_lon_deg: float, fraction: float) -> tuple[float, float, float]:
+    a = GeoLLH(a_lat_deg, a_lon_deg, 0.0)
+    b = GeoLLH(b_lat_deg, b_lon_deg, 0.0)
+    out = GeoLLH()
+    _check(_lib.geo_llh_geodesic_interpolate_wgs84(ctypes.byref(a), ctypes.byref(b), fraction, ctypes.byref(out)),
+           "geo_llh_geodesic_interpolate_wgs84 failed")
+    return (out.lat_deg, out.lon_deg, out.h_m)
+
+def crs_from_epsg(epsg: int) -> dict:
+    out = GeoCRS()
+    _check(_lib.geo_crs_from_epsg(epsg, ctypes.byref(out)), "geo_crs_from_epsg failed")
+    return {
+        "epsg": int(out.epsg),
+        "kind": int(out.kind),
+        "name": out.name.decode("ascii").rstrip("\x00"),
+    }
+
+def crs_normalize_epsg(epsg: int) -> int:
+    out = c_int()
+    _check(_lib.geo_crs_normalize_epsg(epsg, ctypes.byref(out)), "geo_crs_normalize_epsg failed")
+    return int(out.value)
+
+
+def imagery_fit_affine_tie_points_wgs84(tie_points: list[dict]) -> tuple[dict, dict]:
+    if not tie_points:
+        raise ValueError("tie_points must be non-empty")
+    arr_t = GeoTiePoint * len(tie_points)
+    arr = arr_t()
+    for i, tp in enumerate(tie_points):
+        arr[i].image_px = float(tp["image_px"])
+        arr[i].image_py = float(tp["image_py"])
+        arr[i].world_llh = GeoLLH(float(tp["lat_deg"]), float(tp["lon_deg"]), float(tp.get("h_m", 0.0)))
+        arr[i].sigma_px = float(tp.get("sigma_px", 1.0))
+        arr[i].sigma_m = float(tp.get("sigma_m", 1.0))
+
+    model = GeoTiePointAffineModel()
+    stats = GeoTiePointFitStats()
+    _check(_lib.geo_imagery_fit_affine_tie_points_wgs84(arr, len(tie_points), ctypes.byref(model), ctypes.byref(stats)),
+           "geo_imagery_fit_affine_tie_points_wgs84 failed")
+
+    model_out = {
+        "lat_coeff": [float(v) for v in model.lat_coeff],
+        "lon_coeff": [float(v) for v in model.lon_coeff],
+        "h_coeff": [float(v) for v in model.h_coeff],
+    }
+    stats_out = {
+        "inlier_count": int(stats.inlier_count),
+        "total_count": int(stats.total_count),
+        "rmse_px": float(stats.rmse_px),
+        "rmse_m": float(stats.rmse_m),
+    }
+    return model_out, stats_out
+
+def imagery_project_pixel_wgs84(model: dict, image_px: float, image_py: float) -> tuple[float, float, float]:
+    m = GeoTiePointAffineModel()
+    for i in range(3):
+        m.lat_coeff[i] = float(model["lat_coeff"][i])
+        m.lon_coeff[i] = float(model["lon_coeff"][i])
+        m.h_coeff[i] = float(model["h_coeff"][i])
+    out = GeoLLH()
+    _check(_lib.geo_imagery_project_pixel_wgs84(ctypes.byref(m), float(image_px), float(image_py), ctypes.byref(out)),
+           "geo_imagery_project_pixel_wgs84 failed")
+    return (float(out.lat_deg), float(out.lon_deg), float(out.h_m))
+
+def imagery_solve_tie_points_wgs84(tie_points: list[dict]) -> dict:
+    if not tie_points:
+        raise ValueError("tie_points must be non-empty")
+    arr_t = GeoTiePoint * len(tie_points)
+    arr = arr_t()
+    for i, tp in enumerate(tie_points):
+        arr[i].image_px = float(tp["image_px"])
+        arr[i].image_py = float(tp["image_py"])
+        arr[i].world_llh = GeoLLH(float(tp["lat_deg"]), float(tp["lon_deg"]), float(tp.get("h_m", 0.0)))
+        arr[i].sigma_px = float(tp.get("sigma_px", 1.0))
+        arr[i].sigma_m = float(tp.get("sigma_m", 1.0))
+    stats = GeoTiePointFitStats()
+    _check(_lib.geo_imagery_solve_tie_points_wgs84(arr, len(tie_points), ctypes.byref(stats)),
+           "geo_imagery_solve_tie_points_wgs84 failed")
+    return {
+        "inlier_count": int(stats.inlier_count),
+        "total_count": int(stats.total_count),
+        "rmse_px": float(stats.rmse_px),
+        "rmse_m": float(stats.rmse_m),
+    }
