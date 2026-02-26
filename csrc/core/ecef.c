@@ -3,7 +3,7 @@
 #include <math.h>
 
 geo_status_t geo_llh_to_ecef_impl(const geo_llh_t* llh, geo_ecef_t* out) {
-    const wgs84_ellipsoid_t* w = geo_wgs84_ellipsoid();
+    const geo_internal_ellipsoid_t* w = geo_ellipsoid();
     double lat;
     double lon;
     double h;
@@ -33,7 +33,7 @@ geo_status_t geo_llh_to_ecef_impl(const geo_llh_t* llh, geo_ecef_t* out) {
 }
 
 geo_status_t geo_ecef_to_llh_impl(const geo_ecef_t* ecef, geo_llh_t* out) {
-    const wgs84_ellipsoid_t* w = geo_wgs84_ellipsoid();
+    const geo_internal_ellipsoid_t* w = geo_ellipsoid();
     double lon;
     double p;
     double lat;

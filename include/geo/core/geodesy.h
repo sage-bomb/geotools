@@ -3,6 +3,8 @@
 
 #include "geo/core/export.h"
 #include "geo/core/types.h"
+#include "geo/core/ellipsoid.h"
+#include "geo/core/compute_opts.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,19 +16,28 @@ typedef struct {
   double final_bearing_deg;
 } geo_geodesic_inverse_result_t;
 
-GEO_API geo_status_t geo_llh_geodesic_inverse_wgs84(const geo_llh_t* a,
-                                                     const geo_llh_t* b,
-                                                     geo_geodesic_inverse_result_t* out);
+GEO_API geo_status_t geo_geodesic_inverse(const geo_ellipsoid_t* ellip,
+                                          const geo_llh_t* a,
+                                          const geo_llh_t* b,
+                                          const geo_compute_opts_t* opts,
+                                          double* out_distance_m,
+                                          double* out_initial_bearing_deg,
+                                          double* out_final_bearing_deg);
 
-GEO_API geo_status_t geo_llh_geodesic_direct_wgs84(const geo_llh_t* start,
-                                                    double initial_bearing_deg,
-                                                    double distance_m,
-                                                    geo_llh_t* out_end);
+GEO_API geo_status_t geo_geodesic_direct(const geo_ellipsoid_t* ellip,
+                                         const geo_llh_t* a,
+                                         double initial_bearing_deg,
+                                         double distance_m,
+                                         const geo_compute_opts_t* opts,
+                                         geo_llh_t* out_b,
+                                         double* out_final_bearing_deg);
 
-GEO_API geo_status_t geo_llh_geodesic_interpolate_wgs84(const geo_llh_t* a,
-                                                         const geo_llh_t* b,
-                                                         double fraction,
-                                                         geo_llh_t* out);
+GEO_API geo_status_t geo_geodesic_interpolate(const geo_ellipsoid_t* ellip,
+                                              const geo_llh_t* a,
+                                              const geo_llh_t* b,
+                                              double fraction,
+                                              const geo_compute_opts_t* opts,
+                                              geo_llh_t* out);
 
 #ifdef __cplusplus
 }

@@ -38,16 +38,16 @@ class TiePointAffineModel {
 
     TiePointAffineModel model;
     geo_tie_point_fit_stats_t stats{};
-    check(geo_imagery_fit_affine_tie_points_wgs84(c_points.data(), c_points.size(), &model.raw_, &stats),
-          "geo_imagery_fit_affine_tie_points_wgs84 failed");
+    check(geo_imagery_fit_affine_tie_points(c_points.data(), c_points.size(), &model.raw_, &stats),
+          "geo_imagery_fit_affine_tie_points failed");
     if (out_stats) *out_stats = stats;
     return model;
   }
 
   geo_llh_t project(double image_px, double image_py) const {
     geo_llh_t out{};
-    check(geo_imagery_project_pixel_wgs84(&raw_, image_px, image_py, &out),
-          "geo_imagery_project_pixel_wgs84 failed");
+    check(geo_imagery_project_pixel(&raw_, image_px, image_py, &out),
+          "geo_imagery_project_pixel failed");
     return out;
   }
 

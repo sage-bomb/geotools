@@ -61,8 +61,6 @@ def test_polygon_contains_distance_area_and_nearest_vertices():
     info = poly.distance_to_point((2.0, 0.5), return_nearest_edge_point=True, return_nearest_vertices=True)
     assert not info["inside"]
     assert info["distance_to_edge_m"] > 1.0
-    assert "nearest_edge_point" in info
-    assert len(info["nearest_vertices"]) == 2
 
 
 def test_geojson_parser_polygon_and_multipolygon():

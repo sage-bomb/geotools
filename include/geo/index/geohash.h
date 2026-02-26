@@ -10,11 +10,11 @@
 extern "C" {
 #endif
 
-GEO_API geo_status_t geo_ll_to_geohash_wgs84(double lat_deg, double lon_deg, int precision,
+GEO_API geo_status_t geo_ll_to_geohash(double lat_deg, double lon_deg, int precision,
                                              char* out_str, size_t out_sz);
-GEO_API geo_status_t geo_geohash_to_ll_wgs84(const char* geohash, geo_llh_t* out);
-GEO_API geo_status_t geo_geohash_to_ecef_wgs84(const char* geohash, double h_m, geo_ecef_t* out);
-GEO_API geo_status_t geo_ecef_to_geohash_wgs84(const geo_ecef_t* ecef, int precision,
+GEO_API geo_status_t geo_geohash_to_ll(const char* geohash, geo_llh_t* out);
+GEO_API geo_status_t geo_geohash_to_ecef(const char* geohash, double h_m, geo_ecef_t* out);
+GEO_API geo_status_t geo_ecef_to_geohash(const geo_ecef_t* ecef, int precision,
                                                char* out_str, size_t out_sz);
 
 #ifdef __cplusplus

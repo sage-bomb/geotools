@@ -26,14 +26,14 @@ geo_status_t geo_crs_from_epsg(int epsg, geo_crs_t* out) {
     out->epsg = normalized;
 
     if (normalized == 4326) {
-        out->kind = GEO_CRS_KIND_WGS84_GEODETIC;
-        strncpy(out->name, "WGS84 geographic 2D", sizeof(out->name) - 1);
+        out->kind = GEO_CRS_KIND_GEODETIC;
+        strncpy(out->name, "Geodetic geographic 2D", sizeof(out->name) - 1);
     } else if (normalized == 4978) {
-        out->kind = GEO_CRS_KIND_ECEF_WGS84;
-        strncpy(out->name, "WGS84 geocentric", sizeof(out->name) - 1);
+        out->kind = GEO_CRS_KIND_ECEF;
+        strncpy(out->name, "Geodetic geocentric", sizeof(out->name) - 1);
     } else {
-        out->kind = GEO_CRS_KIND_UTM_WGS84;
-        strncpy(out->name, "WGS84 / UTM", sizeof(out->name) - 1);
+        out->kind = GEO_CRS_KIND_UTM;
+        strncpy(out->name, "Geodetic / UTM", sizeof(out->name) - 1);
     }
 
     return GEO_OK;

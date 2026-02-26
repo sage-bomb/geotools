@@ -102,7 +102,7 @@ static void project_affine(const geo_tie_point_affine_model_t* model,
     out->h_m = model->h_coeff[0] + model->h_coeff[1] * px + model->h_coeff[2] * py;
 }
 
-geo_status_t geo_imagery_fit_affine_tie_points_wgs84(const geo_tie_point_t* points,
+geo_status_t geo_imagery_fit_affine_tie_points(const geo_tie_point_t* points,
                                                       size_t count,
                                                       geo_tie_point_affine_model_t* out_model,
                                                       geo_tie_point_fit_stats_t* out_stats) {
@@ -137,7 +137,7 @@ geo_status_t geo_imagery_fit_affine_tie_points_wgs84(const geo_tie_point_t* poin
 
         project_affine(out_model, points[i].image_px, points[i].image_py, &pred);
 
-        st = geo_llh_distance_surface_m_wgs84(&pred, &points[i].world_llh, &surface_m);
+        st = geo_llh_distance_surface_m(&pred, &points[i].world_llh, &surface_m);
         if (st != GEO_OK) return st;
 
         dh = pred.h_m - points[i].world_llh.h_m;
@@ -148,7 +148,7 @@ geo_status_t geo_imagery_fit_affine_tie_points_wgs84(const geo_tie_point_t* poin
     return GEO_OK;
 }
 
-geo_status_t geo_imagery_project_pixel_wgs84(const geo_tie_point_affine_model_t* model,
+geo_status_t geo_imagery_project_pixel(const geo_tie_point_affine_model_t* model,
                                               double image_px,
                                               double image_py,
                                               geo_llh_t* out_llh) {
@@ -159,9 +159,9 @@ geo_status_t geo_imagery_project_pixel_wgs84(const geo_tie_point_affine_model_t*
     return GEO_OK;
 }
 
-geo_status_t geo_imagery_solve_tie_points_wgs84(const geo_tie_point_t* points,
+geo_status_t geo_imagery_solve_tie_points(const geo_tie_point_t* points,
                                                  size_t count,
                                                  geo_tie_point_fit_stats_t* out_stats) {
     geo_tie_point_affine_model_t model;
-    return geo_imagery_fit_affine_tie_points_wgs84(points, count, &model, out_stats);
+    return geo_imagery_fit_affine_tie_points(points, count, &model, out_stats);
 }

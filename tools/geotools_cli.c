@@ -30,7 +30,7 @@ static int cmd_llh_to_ecef(int argc, char** argv) {
   if (argc == 5 && !parse_double(argv[4], &llh.h_m)) return 2;
 
   geo_ecef_t ecef = {0};
-  geo_status_t st = geo_llh_to_ecef_wgs84(&llh, &ecef);
+  geo_status_t st = geo_llh_to_ecef(&llh, &ecef);
   if (st != GEO_OK) return (int)st;
 
   printf("x=%.6f y=%.6f z=%.6f\n", ecef.x, ecef.y, ecef.z);
@@ -46,7 +46,7 @@ static int cmd_ecef_to_llh(int argc, char** argv) {
   }
 
   geo_llh_t llh = {0};
-  geo_status_t st = geo_ecef_to_llh_wgs84(&ecef, &llh);
+  geo_status_t st = geo_ecef_to_llh(&ecef, &llh);
   if (st != GEO_OK) return (int)st;
 
   printf("lat=%.10f lon=%.10f h=%.6f\n", llh.lat_deg, llh.lon_deg, llh.h_m);
@@ -61,7 +61,7 @@ static int cmd_llh_to_utm(int argc, char** argv) {
   if (!parse_double(argv[2], &lat) || !parse_double(argv[3], &lon)) return 2;
 
   geo_utm_t utm = {0};
-  geo_status_t st = geo_ll_to_utm_wgs84(lat, lon, &utm);
+  geo_status_t st = geo_ll_to_utm(lat, lon, &utm);
   if (st != GEO_OK) return (int)st;
 
   printf("zone=%d hemi=%c easting=%.3f northing=%.3f\n", utm.zone, utm.hemi, utm.easting, utm.northing);
@@ -88,13 +88,13 @@ static int cmd_distance_surface(int argc, char** argv) {
 
   geo_point_t pa = {0};
   geo_point_t pb = {0};
-  geo_status_t st = geo_point_init_from_llh_wgs84(&pa, &a);
+  geo_status_t st = geo_point_init_from_llh(&pa, &a);
   if (st != GEO_OK) return (int)st;
-  st = geo_point_init_from_llh_wgs84(&pb, &b);
+  st = geo_point_init_from_llh(&pb, &b);
   if (st != GEO_OK) return (int)st;
 
   double dist_m = 0.0;
-  st = geo_point_distance_surface_m_wgs84(&pa, &pb, &dist_m);
+  st = geo_point_distance_surface_m(&pa, &pb, &dist_m);
   if (st != GEO_OK) return (int)st;
 
   printf("surface_distance_m=%.6f\n", dist_m);

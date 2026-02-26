@@ -202,101 +202,101 @@ geo_status_t geo_sdk_point_export_raw(const geo_sdk_point_t* p, geo_point_t* out
 }
 
 
-geo_status_t geo_sdk_llh_to_ecef_wgs84(const geo_llh_t* llh, geo_ecef_t* out) {
+geo_status_t geo_sdk_llh_to_ecef(const geo_llh_t* llh, geo_ecef_t* out) {
   if (!llh || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_llh_to_ecef_wgs84(llh, out);
+  return geo_llh_to_ecef(llh, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ecef_to_llh_wgs84(const geo_ecef_t* ecef, geo_llh_t* out) {
+geo_status_t geo_sdk_ecef_to_llh(const geo_ecef_t* ecef, geo_llh_t* out) {
   if (!ecef || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ecef_to_llh_wgs84(ecef, out);
+  return geo_ecef_to_llh(ecef, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ll_to_utm_wgs84(double lat_deg, double lon_deg, geo_utm_t* out) {
+geo_status_t geo_sdk_ll_to_utm(double lat_deg, double lon_deg, geo_utm_t* out) {
   if (!out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ll_to_utm_wgs84(lat_deg, lon_deg, out);
+  return geo_ll_to_utm(lat_deg, lon_deg, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_utm_to_ll_wgs84(const geo_utm_t* utm, geo_llh_t* out) {
+geo_status_t geo_sdk_utm_to_ll(const geo_utm_t* utm, geo_llh_t* out) {
   if (!utm || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_utm_to_ll_wgs84(utm, out);
+  return geo_utm_to_ll(utm, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_utm_to_ecef_wgs84(const geo_utm_t* utm, double h_m, geo_ecef_t* out) {
+geo_status_t geo_sdk_utm_to_ecef(const geo_utm_t* utm, double h_m, geo_ecef_t* out) {
   if (!utm || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_utm_to_ecef_wgs84(utm, h_m, out);
+  return geo_utm_to_ecef(utm, h_m, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ecef_to_utm_wgs84(const geo_ecef_t* ecef, geo_utm_t* out) {
+geo_status_t geo_sdk_ecef_to_utm(const geo_ecef_t* ecef, geo_utm_t* out) {
   if (!ecef || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ecef_to_utm_wgs84(ecef, out);
+  return geo_ecef_to_utm(ecef, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ll_to_mgrs_wgs84(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz) {
+geo_status_t geo_sdk_ll_to_mgrs(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz) {
   if (!out_str || out_sz == 0) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ll_to_mgrs_wgs84(lat_deg, lon_deg, precision, out_str, out_sz);
+  return geo_ll_to_mgrs(lat_deg, lon_deg, precision, out_str, out_sz);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_mgrs_to_ll_wgs84(const char* mgrs_str, geo_llh_t* out) {
+geo_status_t geo_sdk_mgrs_to_ll(const char* mgrs_str, geo_llh_t* out) {
   if (!mgrs_str || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_mgrs_to_ll_wgs84(mgrs_str, out);
+  return geo_mgrs_to_ll(mgrs_str, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_mgrs_to_ecef_wgs84(const char* mgrs_str, double h_m, geo_ecef_t* out) {
+geo_status_t geo_sdk_mgrs_to_ecef(const char* mgrs_str, double h_m, geo_ecef_t* out) {
   if (!mgrs_str || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_mgrs_to_ecef_wgs84(mgrs_str, h_m, out);
+  return geo_mgrs_to_ecef(mgrs_str, h_m, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ecef_to_mgrs_wgs84(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz) {
+geo_status_t geo_sdk_ecef_to_mgrs(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz) {
   if (!ecef || !out_str || out_sz == 0) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ecef_to_mgrs_wgs84(ecef, precision, out_str, out_sz);
+  return geo_ecef_to_mgrs(ecef, precision, out_str, out_sz);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ll_to_geohash_wgs84(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz) {
+geo_status_t geo_sdk_ll_to_geohash(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz) {
   if (!out_str || out_sz == 0) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ll_to_geohash_wgs84(lat_deg, lon_deg, precision, out_str, out_sz);
+  return geo_ll_to_geohash(lat_deg, lon_deg, precision, out_str, out_sz);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_geohash_to_ll_wgs84(const char* geohash, geo_llh_t* out) {
+geo_status_t geo_sdk_geohash_to_ll(const char* geohash, geo_llh_t* out) {
   if (!geohash || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_geohash_to_ll_wgs84(geohash, out);
+  return geo_geohash_to_ll(geohash, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_geohash_to_ecef_wgs84(const char* geohash, double h_m, geo_ecef_t* out) {
+geo_status_t geo_sdk_geohash_to_ecef(const char* geohash, double h_m, geo_ecef_t* out) {
   if (!geohash || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_geohash_to_ecef_wgs84(geohash, h_m, out);
+  return geo_geohash_to_ecef(geohash, h_m, out);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ecef_to_geohash_wgs84(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz) {
+geo_status_t geo_sdk_ecef_to_geohash(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz) {
   if (!ecef || !out_str || out_sz == 0) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ecef_to_geohash_wgs84(ecef, precision, out_str, out_sz);
+  return geo_ecef_to_geohash(ecef, precision, out_str, out_sz);
   SDK_TRY_END
 }
 
@@ -307,38 +307,38 @@ geo_status_t geo_sdk_ecef_distance_m(const geo_ecef_t* a, const geo_ecef_t* b, d
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ecef_distance_surface_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m) {
+geo_status_t geo_sdk_ecef_distance_surface_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m) {
   if (!a || !b || !out_m) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ecef_distance_surface_m_wgs84(a, b, out_m);
+  return geo_ecef_distance_surface_m(a, b, out_m);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_ecef_distance_surface_with_elevation_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m) {
+geo_status_t geo_sdk_ecef_distance_surface_with_elevation_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m) {
   if (!a || !b || !out_m) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_ecef_distance_surface_with_elevation_m_wgs84(a, b, out_m);
+  return geo_ecef_distance_surface_with_elevation_m(a, b, out_m);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_llh_geodesic_inverse_wgs84(const geo_llh_t* a, const geo_llh_t* b, geo_geodesic_inverse_result_t* out) {
+geo_status_t geo_sdk_llh_geodesic_inverse(const geo_llh_t* a, const geo_llh_t* b, geo_geodesic_inverse_result_t* out) {
   if (!a || !b || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_llh_geodesic_inverse_wgs84(a, b, out);
+  return geo_geodesic_inverse(NULL, a, b, NULL, &out->distance_m, &out->initial_bearing_deg, &out->final_bearing_deg);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_llh_geodesic_direct_wgs84(const geo_llh_t* start, double initial_bearing_deg, double distance_m, geo_llh_t* out_end) {
+geo_status_t geo_sdk_llh_geodesic_direct(const geo_llh_t* start, double initial_bearing_deg, double distance_m, geo_llh_t* out_end) {
   if (!start || !out_end) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_llh_geodesic_direct_wgs84(start, initial_bearing_deg, distance_m, out_end);
+  return geo_geodesic_direct(NULL, start, initial_bearing_deg, distance_m, NULL, out_end, NULL);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_llh_geodesic_interpolate_wgs84(const geo_llh_t* a, const geo_llh_t* b, double fraction, geo_llh_t* out) {
+geo_status_t geo_sdk_llh_geodesic_interpolate(const geo_llh_t* a, const geo_llh_t* b, double fraction, geo_llh_t* out) {
   if (!a || !b || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_llh_geodesic_interpolate_wgs84(a, b, fraction, out);
+  return geo_geodesic_interpolate(NULL, a, b, fraction, NULL, out);
   SDK_TRY_END
 }
 
@@ -356,24 +356,24 @@ geo_status_t geo_sdk_crs_normalize_epsg(int epsg, int* out_epsg) {
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_imagery_fit_affine_tie_points_wgs84(const geo_tie_point_t* points, size_t count, geo_tie_point_affine_model_t* out_model, geo_tie_point_fit_stats_t* out_stats) {
+geo_status_t geo_sdk_imagery_fit_affine_tie_points(const geo_tie_point_t* points, size_t count, geo_tie_point_affine_model_t* out_model, geo_tie_point_fit_stats_t* out_stats) {
   if (!points || !out_model || !out_stats || count == 0) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_imagery_fit_affine_tie_points_wgs84(points, count, out_model, out_stats);
+  return geo_imagery_fit_affine_tie_points(points, count, out_model, out_stats);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_imagery_project_pixel_wgs84(const geo_tie_point_affine_model_t* model, double image_px, double image_py, geo_llh_t* out_llh) {
+geo_status_t geo_sdk_imagery_project_pixel(const geo_tie_point_affine_model_t* model, double image_px, double image_py, geo_llh_t* out_llh) {
   if (!model || !out_llh) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_imagery_project_pixel_wgs84(model, image_px, image_py, out_llh);
+  return geo_imagery_project_pixel(model, image_px, image_py, out_llh);
   SDK_TRY_END
 }
 
-geo_status_t geo_sdk_imagery_solve_tie_points_wgs84(const geo_tie_point_t* points, size_t count, geo_tie_point_fit_stats_t* out_stats) {
+geo_status_t geo_sdk_imagery_solve_tie_points(const geo_tie_point_t* points, size_t count, geo_tie_point_fit_stats_t* out_stats) {
   if (!points || !out_stats || count == 0) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_imagery_solve_tie_points_wgs84(points, count, out_stats);
+  return geo_imagery_solve_tie_points(points, count, out_stats);
   SDK_TRY_END
 }
 

@@ -31,7 +31,7 @@ static double utm_central_meridian_rad(int zone) {
 }
 
 geo_status_t geo_ll_to_utm_impl(double lat_deg, double lon_deg, geo_utm_t* out) {
-    const wgs84_ellipsoid_t* w = geo_wgs84_ellipsoid();
+    const geo_internal_ellipsoid_t* w = geo_ellipsoid();
     double lat, lon, lon0;
     double sinp, cosp, tanp, N, T, C, A;
     double e2, ep2, e4, e6, M;
@@ -77,7 +77,7 @@ geo_status_t geo_ll_to_utm_impl(double lat_deg, double lon_deg, geo_utm_t* out) 
 }
 
 geo_status_t geo_utm_to_ll_impl(const geo_utm_t* utm, geo_llh_t* out) {
-    const wgs84_ellipsoid_t* w = geo_wgs84_ellipsoid();
+    const geo_internal_ellipsoid_t* w = geo_ellipsoid();
     double x, y, lon0, e2, ep2, e1, M, mu;
     double e1_2, e1_3, e1_4, J1, J2, J3, J4;
     double fp, sinfp, cosfp, tanfp, C1, T1, N1, R1, D;

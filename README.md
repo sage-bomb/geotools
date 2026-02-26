@@ -56,9 +56,9 @@ The C and Python APIs now include an affine tie-point workflow:
 - Return fit quality metrics (`rmse_m`, inlier/total counts).
 
 See Python entry points:
-- `imagery_fit_affine_tie_points_wgs84`
-- `imagery_project_pixel_wgs84`
-- `imagery_solve_tie_points_wgs84` (backward-compatible stats-only entrypoint)
+- `imagery_fit_affine_tie_points`
+- `imagery_project_pixel`
+- `imagery_solve_tie_points` (backward-compatible stats-only entrypoint)
 
 
 ## C++ API (Phase 3)
@@ -165,9 +165,9 @@ Recent additions include high-throughput bulk filtering and path-distance traver
 
 ### C API additions
 
-- Bulk container + filters: `geo_bulk_points_*` and `geo_filter_polygons_by_polygon_wgs84`.
-- Polyline helpers: `geo_polyline_length_m_wgs84`, `geo_polyline_distance_to_point_wgs84`, `geo_polyline_position_at_distance_wgs84`.
-- Polygon path helpers: `geo_polygon_perimeter_m_wgs84`, `geo_polygon_position_at_distance_wgs84`.
+- Bulk container + filters: `geo_bulk_points_*` and `geo_filter_polygons_by_polygon`.
+- Polyline helpers: `geo_polyline_length_m`, `geo_polyline_distance_to_point`, `geo_polyline_position_at_distance`.
+- Polygon path helpers: `geo_polygon_perimeter_m`, `geo_polygon_position_at_distance`.
 
 ### Python additions
 

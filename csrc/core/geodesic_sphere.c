@@ -1,0 +1,1 @@
+/* sphere geodesic support is implemented in geodesy.c via mode switch */

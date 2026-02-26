@@ -40,13 +40,13 @@ def _make_affine_tie_points():
 
 def test_imagery_affine_fit_and_project():
     tie_points = _make_affine_tie_points()
-    model, stats = g.imagery_fit_affine_tie_points_wgs84(tie_points)
+    model, stats = g.imagery_fit_affine_tie_points(tie_points)
 
     assert stats["inlier_count"] == len(tie_points)
     assert stats["total_count"] == len(tie_points)
     assert stats["rmse_m"] < 1e-5
 
-    lat, lon, h = g.imagery_project_pixel_wgs84(model, 400.0, 600.0)
+    lat, lon, h = g.imagery_project_pixel(model, 400.0, 600.0)
     exp_lat = 35.0 + 1.0e-4 * 400.0 - 5.0e-5 * 600.0
     exp_lon = -120.0 + 8.0e-5 * 400.0 + 9.0e-5 * 600.0
     exp_h = 100.0 + 0.01 * 400.0 - 0.02 * 600.0
@@ -58,7 +58,7 @@ def test_imagery_affine_fit_and_project():
 
 def test_imagery_backward_compat_solver_stats():
     tie_points = _make_affine_tie_points()
-    stats = g.imagery_solve_tie_points_wgs84(tie_points)
+    stats = g.imagery_solve_tie_points(tie_points)
     assert stats["inlier_count"] == len(tie_points)
     assert stats["total_count"] == len(tie_points)
     assert stats["rmse_m"] < 1e-5
@@ -67,4 +67,4 @@ def test_imagery_backward_compat_solver_stats():
 def test_imagery_requires_enough_points():
     tie_points = _make_affine_tie_points()[:2]
     with pytest.raises(g.GeoError):
-        g.imagery_fit_affine_tie_points_wgs84(tie_points)
+        g.imagery_fit_affine_tie_points(tie_points)

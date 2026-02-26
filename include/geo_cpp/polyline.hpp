@@ -18,22 +18,22 @@ class Polyline {
 
   double length_m() const {
     double out = 0.0;
-    check(geo_polyline_length_m_wgs84(points_.data(), points_.size(), &out), "geo_polyline_length_m_wgs84 failed");
+    check(geo_polyline_length_m(nullptr, points_.data(), points_.size(), nullptr, &out), "geo_polyline_length_m failed");
     return out;
   }
 
   double distance_to_point_m(const geo_llh_t& point, geo_llh_t* nearest_point = nullptr) const {
     double out = 0.0;
-    check(geo_polyline_distance_to_point_wgs84(points_.data(), points_.size(), &point,
+    check(geo_polyline_distance_to_point(nullptr, points_.data(), points_.size(), &point, nullptr,
                                                nearest_point ? 1 : 0, nearest_point, &out),
-          "geo_polyline_distance_to_point_wgs84 failed");
+          "geo_polyline_distance_to_point failed");
     return out;
   }
 
   geo_llh_t position_at_distance_m(double distance_m, bool from_end = false) const {
     geo_llh_t out{};
-    check(geo_polyline_position_at_distance_wgs84(points_.data(), points_.size(), distance_m, from_end ? 1 : 0, &out),
-          "geo_polyline_position_at_distance_wgs84 failed");
+    check(geo_polyline_position_at_distance(nullptr, points_.data(), points_.size(), distance_m, from_end ? 1 : 0, nullptr, &out),
+          "geo_polyline_position_at_distance failed");
     return out;
   }
 
