@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from typing import List
@@ -111,6 +112,18 @@ class PolygonsByPolygonRequest(BaseModel):
 app = FastAPI(title="geotools microservice", version="0.2.0")
 
 
+API_CATALOG_PATH = REPO_ROOT / "docs" / "api_reference_catalog.json"
+API_MARKDOWN_PATH = REPO_ROOT / "docs" / "API_REFERENCE.md"
+
+
+def _load_api_catalog() -> dict:
+    return json.loads(API_CATALOG_PATH.read_text())
+
+
+def _load_api_markdown() -> str:
+    return API_MARKDOWN_PATH.read_text()
+
+
 def _to_geopoint(p: LLHIn) -> g.GeoPointData:
     return g.GeoPointData(p.lat_deg, p.lon_deg, p.h_m)
 
@@ -126,6 +139,16 @@ def _to_polygon(outer: List[LLHIn]) -> g.GeoPolygon:
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.get("/docs/api-reference")
+def docs_api_reference_json():
+    return _load_api_catalog()
+
+
+@app.get("/docs/api-reference/markdown")
+def docs_api_reference_markdown():
+    return {"markdown": _load_api_markdown()}
 
 
 @app.post("/convert/llh-ecef")

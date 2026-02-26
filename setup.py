@@ -21,6 +21,47 @@ def _shared_lib_name() -> str:
         return "libgeotools.so"
 
 
+
+
+def _sdk_lib_name() -> str:
+    if sys.platform == "darwin":
+        return "libgeotools_sdk.dylib"
+    elif os.name == "nt":
+        return "geotools_sdk.dll"
+    else:
+        return "libgeotools_sdk.so"
+
+
+def _build_cpp_sdk(repo: Path, out_path: Path, c_lib_dir: Path) -> None:
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    if os.name == "nt":
+        raise RuntimeError("Windows SDK build not implemented")
+
+    cpp_sources = sorted((repo / "cppsrc").glob("*.cpp"))
+    if not cpp_sources:
+        return
+
+    cmd = [
+        "g++", "-std=c++17", "-O2", "-fPIC", "-shared",
+        "-I" + str(repo / "include"),
+        *[str(s) for s in cpp_sources],
+        "-L" + str(c_lib_dir), "-lgeotools",
+        "-Wl,-rpath,$ORIGIN",
+        "-o", str(out_path),
+    ]
+    if sys.platform == "darwin":
+        cmd = [
+            "g++", "-std=c++17", "-O2", "-fPIC", "-dynamiclib",
+            "-I" + str(repo / "include"),
+            *[str(s) for s in cpp_sources],
+            "-L" + str(c_lib_dir), "-lgeotools",
+            "-Wl,-rpath,@loader_path",
+            "-o", str(out_path),
+        ]
+
+    print("Building C++ SDK library:", " ".join(cmd))
+    subprocess.check_call(cmd)
+
 def _build_shared(c_files: list[Path], out_path: Path, include_dirs: list[Path]) -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -68,6 +109,10 @@ class build_py(_build_py):
         out2 = repo / "src" / "geotools" / so_name
         _build_shared(c_files, out2, include_dirs)
 
+        sdk_name = _sdk_lib_name()
+        _build_cpp_sdk(repo, Path(self.build_lib) / "geotools" / sdk_name, Path(self.build_lib) / "geotools")
+        _build_cpp_sdk(repo, repo / "src" / "geotools" / sdk_name, repo / "src" / "geotools")
+
 
 setup(
     name="geotools",
@@ -76,7 +121,7 @@ setup(
     package_dir={"": "src"},
     packages=find_packages(where="src"),
     include_package_data=True,
-    package_data={"geotools": [_shared_lib_name()]},
+    package_data={"geotools": [_shared_lib_name(), _sdk_lib_name()]},
     extras_require={
         "test": ["pytest", "pyproj", "mgrs"],
     },

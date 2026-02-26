@@ -19,6 +19,8 @@ uvicorn examples.microservice.app:app --host 0.0.0.0 --port 8000
 ### Core
 
 - `GET /health`
+- `GET /docs/api-reference`
+- `GET /docs/api-reference/markdown`
 - `POST /convert/llh-ecef`
 - `POST /convert/ecef-llh`
 - `POST /imagery/fit-affine`
