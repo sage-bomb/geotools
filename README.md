@@ -6,6 +6,7 @@ C + Python (ctypes) WGS84 geospatial conversion library.
 ## Project roadmap
 
 - See `docs/UNIVERSAL_GEOTOOLS_ROADMAP.md` for a staged plan to expand geotools into a multi-language, high-performance geospatial and geopositioning platform.
+- See `docs/API_REFERENCE_NEW_FEATURES.md` for the newly added polyline, polygon pathing, and bulk relationship APIs.
 
 ## Prerequisites
 
@@ -117,3 +118,30 @@ Supported now via C-backed APIs (with Python wrappers):
 - Boolean polygon operations (`union`, `intersection`, `difference`, `xor`, `not`) are implemented in C for convex polygon workflows (`GeoPolygon` inputs).
 
 Note: Current C boolean operations are convex-polygon focused; overlapping `difference` / `xor` edge-cases may return `GEO_ERR_UNSUPPORTED`.
+
+
+## New APIs: bulk relationships + polyline/polygon pathing
+
+Recent additions include high-throughput bulk filtering and path-distance traversal helpers.
+
+### C API additions
+
+- Bulk container + filters: `geo_bulk_points_*` and `geo_filter_polygons_by_polygon_wgs84`.
+- Polyline helpers: `geo_polyline_length_m_wgs84`, `geo_polyline_distance_to_point_wgs84`, `geo_polyline_position_at_distance_wgs84`.
+- Polygon path helpers: `geo_polygon_perimeter_m_wgs84`, `geo_polygon_position_at_distance_wgs84`.
+
+### Python additions
+
+- `BulkGeoPoints` and `filter_polygons_by_polygon(...)`.
+- `GeoPolyline` (`total_length_m`, `distance_to_point`, `position_at_distance`).
+- `GeoPolygon.perimeter_m` and `GeoPolygon.position_at_distance(...)`.
+
+### Microservice additions
+
+`examples/microservice/app.py` now includes endpoints for:
+
+- Polyline length, distance-to-point, and position-at-distance.
+- Polygon perimeter and position-at-distance.
+- Bulk proximity, bulk polygon filtering, and polygon-by-polygon filtering.
+
+Refer to `examples/microservice/README.md` and `docs/API_REFERENCE_NEW_FEATURES.md` for endpoint and payload details.

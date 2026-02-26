@@ -33,10 +33,10 @@ def _build_shared(c_files: list[Path], out_path: Path, include_dirs: list[Path])
     # Linux / macOS
     include_flags = [f"-I{inc}" for inc in include_dirs]
     sources = [str(c) for c in c_files]
-    cmd = ["cc", "-O2", "-fPIC", "-shared", *include_flags, *sources, "-o", str(out_path), "-lm"]
+    cmd = ["cc", "-O2", "-fPIC", "-shared", *include_flags, *sources, "-o", str(out_path), "-lm", "-pthread"]
 
     if sys.platform == "darwin":
-        cmd = ["cc", "-O2", "-fPIC", "-dynamiclib", *include_flags, *sources, "-o", str(out_path), "-lm"]
+        cmd = ["cc", "-O2", "-fPIC", "-dynamiclib", *include_flags, *sources, "-o", str(out_path), "-lm", "-pthread"]
 
     print("Building native library:", " ".join(cmd))
     subprocess.check_call(cmd)

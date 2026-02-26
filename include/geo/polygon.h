@@ -18,6 +18,16 @@ GEO_API geo_status_t geo_polygon_contains_wgs84(const geo_llh_t* outer, size_t o
                                                 const size_t* hole_counts, size_t hole_count,
                                                 const geo_llh_t* point, int* out_inside);
 
+
+GEO_API geo_status_t geo_polygon_perimeter_m_wgs84(const geo_llh_t* outer, size_t outer_count,
+                                                    double* out_perimeter_m);
+
+GEO_API geo_status_t geo_polygon_position_at_distance_wgs84(const geo_llh_t* outer, size_t outer_count,
+                                                             double distance_m,
+                                                             int from_end,
+                                                             int cyclic,
+                                                             geo_llh_t* out_point);
+
 GEO_API geo_status_t geo_polygon_distance_to_point_wgs84(const geo_llh_t* outer, size_t outer_count,
                                                          const geo_llh_t* holes, const size_t* hole_offsets,
                                                          const size_t* hole_counts, size_t hole_count,
