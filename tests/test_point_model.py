@@ -87,3 +87,14 @@ def test_point_geohash_lazy_cache_and_bidirectional_updates():
     p.set_geohash("dr5regw3ppyx")
     ecef_after = p.ecef
     assert ecef_after != ecef_before
+
+
+def test_geohash_top_level_helpers_work():
+    import geotools as g
+
+    gh = g.ll_to_geohash(40.0, -74.0, precision=8)
+    assert isinstance(gh, str) and len(gh) == 8
+
+    x, y, z = g.geohash_to_ecef(gh, 0.0)
+    gh2 = g.ecef_to_geohash(x, y, z, precision=8)
+    assert isinstance(gh2, str) and len(gh2) == 8

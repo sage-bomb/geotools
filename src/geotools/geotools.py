@@ -2,7 +2,7 @@ import os
 import sys
 import ctypes
 from ctypes import (
-    c_int, c_char, c_double, c_size_t, c_char_p, c_uint, c_uint64,
+    c_int, c_char, c_double, c_size_t, c_char_p, c_uint, c_uint64, c_void_p,
     POINTER, Structure
 )
 
@@ -26,6 +26,29 @@ def _default_libpath() -> str:
     """
     return str(Path(__file__).resolve().with_name(_default_libname()))
 
+
+
+def _default_sdk_libname() -> str:
+    if sys.platform.startswith("linux"):
+        return "libgeotools_sdk.so"
+    if sys.platform == "darwin":
+        return "libgeotools_sdk.dylib"
+    if sys.platform in ("win32", "cygwin"):
+        return "geotools_sdk.dll"
+    raise RuntimeError(f"Unsupported platform: {sys.platform}")
+
+
+def _default_sdk_libpath() -> str:
+    return str(Path(__file__).resolve().with_name(_default_sdk_libname()))
+
+
+def load_sdk_library(path: str | None = None) -> ctypes.CDLL | None:
+    if path is None:
+        path = _default_sdk_libpath()
+    if not Path(path).exists():
+        return None
+    return ctypes.CDLL(path)
+
 def load_library(path: str | None = None) -> ctypes.CDLL:
     """
     Load the shared library.
@@ -37,6 +60,7 @@ def load_library(path: str | None = None) -> ctypes.CDLL:
     return ctypes.CDLL(path)
 
 _lib = load_library()
+_sdk_lib = load_sdk_library()
 
 # ----------------- Mirror C structs (public geo_* types) -----------------
 class GeoECEF(Structure):
@@ -148,6 +172,50 @@ class GeoError(RuntimeError):
 def _check(status: int, msg: str = "") -> None:
     if status != GEO_OK:
         raise GeoError(status, msg)
+
+
+if _sdk_lib is not None:
+    _sdk_lib.geo_sdk_point_create_from_llh.argtypes = [c_double, c_double, c_double, POINTER(c_void_p)]
+    _sdk_lib.geo_sdk_point_create_from_llh.restype = c_int
+    _sdk_lib.geo_sdk_point_create_from_ecef.argtypes = [c_double, c_double, c_double, POINTER(c_void_p)]
+    _sdk_lib.geo_sdk_point_create_from_ecef.restype = c_int
+    _sdk_lib.geo_sdk_point_create_from_utm.argtypes = [c_int, c_char, c_double, c_double, c_double, POINTER(c_void_p)]
+    _sdk_lib.geo_sdk_point_create_from_utm.restype = c_int
+    _sdk_lib.geo_sdk_point_create_from_mgrs.argtypes = [c_char_p, c_double, POINTER(c_void_p)]
+    _sdk_lib.geo_sdk_point_create_from_mgrs.restype = c_int
+    _sdk_lib.geo_sdk_point_create_from_geohash.argtypes = [c_char_p, c_double, POINTER(c_void_p)]
+    _sdk_lib.geo_sdk_point_create_from_geohash.restype = c_int
+    _sdk_lib.geo_sdk_point_destroy.argtypes = [c_void_p]
+    _sdk_lib.geo_sdk_point_destroy.restype = c_int
+
+    _sdk_lib.geo_sdk_point_get_llh.argtypes = [c_void_p, POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_point_get_llh.restype = c_int
+    _sdk_lib.geo_sdk_point_set_llh.argtypes = [c_void_p, c_double, c_double, c_double]
+    _sdk_lib.geo_sdk_point_set_llh.restype = c_int
+    _sdk_lib.geo_sdk_point_get_ecef.argtypes = [c_void_p, POINTER(GeoECEF)]
+    _sdk_lib.geo_sdk_point_get_ecef.restype = c_int
+    _sdk_lib.geo_sdk_point_set_ecef.argtypes = [c_void_p, c_double, c_double, c_double]
+    _sdk_lib.geo_sdk_point_set_ecef.restype = c_int
+    _sdk_lib.geo_sdk_point_get_utm.argtypes = [c_void_p, POINTER(GeoUTM)]
+    _sdk_lib.geo_sdk_point_get_utm.restype = c_int
+    _sdk_lib.geo_sdk_point_set_utm.argtypes = [c_void_p, c_int, c_char, c_double, c_double, c_double]
+    _sdk_lib.geo_sdk_point_set_utm.restype = c_int
+    _sdk_lib.geo_sdk_point_get_mgrs.argtypes = [c_void_p, c_int, c_char_p, c_size_t]
+    _sdk_lib.geo_sdk_point_get_mgrs.restype = c_int
+    _sdk_lib.geo_sdk_point_set_mgrs.argtypes = [c_void_p, c_char_p, c_double]
+    _sdk_lib.geo_sdk_point_set_mgrs.restype = c_int
+    _sdk_lib.geo_sdk_point_get_geohash.argtypes = [c_void_p, c_int, c_char_p, c_size_t]
+    _sdk_lib.geo_sdk_point_get_geohash.restype = c_int
+    _sdk_lib.geo_sdk_point_set_geohash.argtypes = [c_void_p, c_char_p, c_double]
+    _sdk_lib.geo_sdk_point_set_geohash.restype = c_int
+    _sdk_lib.geo_sdk_point_distance_straight_m.argtypes = [c_void_p, c_void_p, POINTER(c_double)]
+    _sdk_lib.geo_sdk_point_distance_straight_m.restype = c_int
+    _sdk_lib.geo_sdk_point_distance_surface_m.argtypes = [c_void_p, c_void_p, POINTER(c_double)]
+    _sdk_lib.geo_sdk_point_distance_surface_m.restype = c_int
+    _sdk_lib.geo_sdk_point_distance_surface_with_elevation_m.argtypes = [c_void_p, c_void_p, POINTER(c_double)]
+    _sdk_lib.geo_sdk_point_distance_surface_with_elevation_m.restype = c_int
+    _sdk_lib.geo_sdk_point_export_raw.argtypes = [c_void_p, POINTER(GeoPoint)]
+    _sdk_lib.geo_sdk_point_export_raw.restype = c_int
 
 # ----------------- Declare function signatures -----------------
 # geo_status_t geo_llh_to_ecef_wgs84(const geo_llh_t* llh, geo_ecef_t* out);
@@ -419,10 +487,9 @@ def ecef_to_mgrs(x: float, y: float, z: float, precision: int = 5, buf_sz: int =
     )
 
 def ll_to_geohash(lat_deg: float, lon_deg: float, precision: int = 12, buf_sz: int = 32) -> str:
-    return _string_out(
+    return _call_with_growing_buffer(
         lambda buf, sz: _lib.geo_ll_to_geohash_wgs84(lat_deg, lon_deg, int(precision), buf, sz),
-        "geo_ll_to_geohash_wgs84 failed",
-        buf_sz=buf_sz,
+        initial_size=buf_sz,
     )
 
 def geohash_to_ll(geohash: str) -> tuple[float, float]:
@@ -439,10 +506,9 @@ def geohash_to_ecef(geohash: str, h_m: float = 0.0) -> tuple[float, float, float
 
 def ecef_to_geohash(x: float, y: float, z: float, precision: int = 12, buf_sz: int = 32) -> str:
     e = GeoECEF(float(x), float(y), float(z))
-    return _string_out(
+    return _call_with_growing_buffer(
         lambda buf, sz: _lib.geo_ecef_to_geohash_wgs84(ctypes.byref(e), int(precision), buf, sz),
-        "geo_ecef_to_geohash_wgs84 failed",
-        buf_sz=buf_sz,
+        initial_size=buf_sz,
     )
 
 def mgrs_parse(mgrs: str) -> dict:
@@ -538,7 +604,33 @@ class Point:
     def __init__(self, *, lat_deg: float | None = None, lon_deg: float | None = None, h_m: float = 0.0,
                  ecef: tuple[float, float, float] | None = None,
                  utm: dict | None = None, mgrs: str | None = None, geohash: str | None = None):
+        self._sdk_handle = c_void_p()
         self._point = GeoPoint()
+        self._use_sdk = _sdk_lib is not None
+
+        if self._use_sdk:
+            self._init_sdk(lat_deg=lat_deg, lon_deg=lon_deg, h_m=h_m, ecef=ecef, utm=utm, mgrs=mgrs, geohash=geohash)
+        else:
+            self._init_c(lat_deg=lat_deg, lon_deg=lon_deg, h_m=h_m, ecef=ecef, utm=utm, mgrs=mgrs, geohash=geohash)
+
+    def _init_sdk(self, *, lat_deg, lon_deg, h_m, ecef, utm, mgrs, geohash):
+        out = c_void_p()
+        if ecef is not None:
+            st = _sdk_lib.geo_sdk_point_create_from_ecef(float(ecef[0]), float(ecef[1]), float(ecef[2]), ctypes.byref(out))
+        elif utm is not None:
+            st = _sdk_lib.geo_sdk_point_create_from_utm(int(utm["zone"]), str(utm["hemi"]).encode("ascii"), float(utm["easting"]), float(utm["northing"]), float(h_m), ctypes.byref(out))
+        elif mgrs is not None:
+            st = _sdk_lib.geo_sdk_point_create_from_mgrs(mgrs.encode("ascii"), float(h_m), ctypes.byref(out))
+        elif geohash is not None:
+            st = _sdk_lib.geo_sdk_point_create_from_geohash(geohash.encode("ascii"), float(h_m), ctypes.byref(out))
+        elif lat_deg is not None and lon_deg is not None:
+            st = _sdk_lib.geo_sdk_point_create_from_llh(float(lat_deg), float(lon_deg), float(h_m), ctypes.byref(out))
+        else:
+            raise ValueError("Point requires LL, UTM, MGRS, geohash, or ECEF input")
+        _check(st, "geo_sdk_point_create failed")
+        self._sdk_handle = out
+
+    def _init_c(self, *, lat_deg, lon_deg, h_m, ecef, utm, mgrs, geohash):
         if ecef is not None:
             e = GeoECEF(float(ecef[0]), float(ecef[1]), float(ecef[2]))
             _check(_lib.geo_point_init_from_ecef(ctypes.byref(self._point), ctypes.byref(e)),
@@ -560,83 +652,143 @@ class Point:
         else:
             raise ValueError("Point requires LL, UTM, MGRS, geohash, or ECEF input")
 
+    def __del__(self):
+        try:
+            if getattr(self, "_use_sdk", False) and getattr(self, "_sdk_handle", None):
+                if self._sdk_handle.value:
+                    _sdk_lib.geo_sdk_point_destroy(self._sdk_handle)
+                    self._sdk_handle = c_void_p()
+        except Exception:
+            pass
+
     @property
     def ecef(self) -> tuple[float, float, float]:
         out = GeoECEF()
-        _check(_lib.geo_point_get_ecef(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_ecef failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_get_ecef(self._sdk_handle, ctypes.byref(out)), "geo_sdk_point_get_ecef failed")
+        else:
+            _check(_lib.geo_point_get_ecef(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_ecef failed")
         return (float(out.x), float(out.y), float(out.z))
 
     @ecef.setter
     def ecef(self, value: tuple[float, float, float]) -> None:
-        e = GeoECEF(float(value[0]), float(value[1]), float(value[2]))
-        _check(_lib.geo_point_set_ecef(ctypes.byref(self._point), ctypes.byref(e)), "geo_point_set_ecef failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_set_ecef(self._sdk_handle, float(value[0]), float(value[1]), float(value[2])),
+                   "geo_sdk_point_set_ecef failed")
+        else:
+            e = GeoECEF(float(value[0]), float(value[1]), float(value[2]))
+            _check(_lib.geo_point_set_ecef(ctypes.byref(self._point), ctypes.byref(e)), "geo_point_set_ecef failed")
 
     @property
     def llh(self) -> tuple[float, float, float]:
         out = GeoLLH()
-        _check(_lib.geo_point_get_llh_wgs84(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_llh_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_get_llh(self._sdk_handle, ctypes.byref(out)), "geo_sdk_point_get_llh failed")
+        else:
+            _check(_lib.geo_point_get_llh_wgs84(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_llh_wgs84 failed")
         return (float(out.lat_deg), float(out.lon_deg), float(out.h_m))
 
     @llh.setter
     def llh(self, value: tuple[float, float, float] | tuple[float, float]) -> None:
         h_m = 0.0 if len(value) < 3 else float(value[2])
-        llh = GeoLLH(float(value[0]), float(value[1]), h_m)
-        _check(_lib.geo_point_set_llh_wgs84(ctypes.byref(self._point), ctypes.byref(llh)), "geo_point_set_llh_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_set_llh(self._sdk_handle, float(value[0]), float(value[1]), h_m),
+                   "geo_sdk_point_set_llh failed")
+        else:
+            llh = GeoLLH(float(value[0]), float(value[1]), h_m)
+            _check(_lib.geo_point_set_llh_wgs84(ctypes.byref(self._point), ctypes.byref(llh)), "geo_point_set_llh_wgs84 failed")
 
     @property
     def utm(self) -> dict:
         out = GeoUTM()
-        _check(_lib.geo_point_get_utm_wgs84(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_utm_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_get_utm(self._sdk_handle, ctypes.byref(out)), "geo_sdk_point_get_utm failed")
+        else:
+            _check(_lib.geo_point_get_utm_wgs84(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_utm_wgs84 failed")
         return {"zone": int(out.zone), "hemi": out.hemi.decode("ascii"), "easting": float(out.easting), "northing": float(out.northing)}
 
     @utm.setter
     def utm(self, value: dict) -> None:
         h_m = float(value.get("h_m", 0.0))
-        u = GeoUTM(int(value["zone"]), str(value["hemi"]).encode("ascii"), float(value["easting"]), float(value["northing"]))
-        _check(_lib.geo_point_set_utm_wgs84(ctypes.byref(self._point), ctypes.byref(u), h_m), "geo_point_set_utm_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_set_utm(self._sdk_handle, int(value["zone"]), str(value["hemi"]).encode("ascii"),
+                   float(value["easting"]), float(value["northing"]), h_m), "geo_sdk_point_set_utm failed")
+        else:
+            u = GeoUTM(int(value["zone"]), str(value["hemi"]).encode("ascii"), float(value["easting"]), float(value["northing"]))
+            _check(_lib.geo_point_set_utm_wgs84(ctypes.byref(self._point), ctypes.byref(u), h_m), "geo_point_set_utm_wgs84 failed")
 
     def get_mgrs(self, precision: int = 5) -> str:
         buf = ctypes.create_string_buffer(64)
-        _check(_lib.geo_point_get_mgrs_wgs84(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
-               "geo_point_get_mgrs_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_get_mgrs(self._sdk_handle, int(precision), buf, ctypes.sizeof(buf)),
+                   "geo_sdk_point_get_mgrs failed")
+        else:
+            _check(_lib.geo_point_get_mgrs_wgs84(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
+                   "geo_point_get_mgrs_wgs84 failed")
         return buf.value.decode("ascii")
 
     def set_mgrs(self, mgrs: str, h_m: float = 0.0) -> None:
-        _check(_lib.geo_point_set_mgrs_wgs84(ctypes.byref(self._point), mgrs.encode("ascii"), float(h_m)),
-               "geo_point_set_mgrs_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_set_mgrs(self._sdk_handle, mgrs.encode("ascii"), float(h_m)),
+                   "geo_sdk_point_set_mgrs failed")
+        else:
+            _check(_lib.geo_point_set_mgrs_wgs84(ctypes.byref(self._point), mgrs.encode("ascii"), float(h_m)),
+                   "geo_point_set_mgrs_wgs84 failed")
 
     def get_geohash(self, precision: int = 12) -> str:
         buf = ctypes.create_string_buffer(32)
-        _check(_lib.geo_point_get_geohash_wgs84(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
-               "geo_point_get_geohash_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_get_geohash(self._sdk_handle, int(precision), buf, ctypes.sizeof(buf)),
+                   "geo_sdk_point_get_geohash failed")
+        else:
+            _check(_lib.geo_point_get_geohash_wgs84(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
+                   "geo_point_get_geohash_wgs84 failed")
         return buf.value.decode("ascii")
 
     def set_geohash(self, geohash: str, h_m: float = 0.0) -> None:
-        _check(_lib.geo_point_set_geohash_wgs84(ctypes.byref(self._point), geohash.encode("ascii"), float(h_m)),
-               "geo_point_set_geohash_wgs84 failed")
+        if self._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_set_geohash(self._sdk_handle, geohash.encode("ascii"), float(h_m)),
+                   "geo_sdk_point_set_geohash failed")
+        else:
+            _check(_lib.geo_point_set_geohash_wgs84(ctypes.byref(self._point), geohash.encode("ascii"), float(h_m)),
+                   "geo_point_set_geohash_wgs84 failed")
 
     def distance_straight(self, other: "Point") -> float:
         out = c_double()
-        _check(_lib.geo_point_distance_straight_m(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
-               "geo_point_distance_straight_m failed")
+        if self._use_sdk and other._use_sdk:
+            _check(_sdk_lib.geo_sdk_point_distance_straight_m(self._sdk_handle, other._sdk_handle, ctypes.byref(out)),
+                   "geo_sdk_point_distance_straight_m failed")
+        else:
+            _check(_lib.geo_point_distance_straight_m(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
+                   "geo_point_distance_straight_m failed")
         return float(out.value)
 
     def distance_surface(self, other: "Point", include_elevation: bool = False) -> float:
         out = c_double()
-        if include_elevation:
-            _check(_lib.geo_point_distance_surface_with_elevation_m_wgs84(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
-                   "geo_point_distance_surface_with_elevation_m_wgs84 failed")
+        if self._use_sdk and other._use_sdk:
+            if include_elevation:
+                _check(_sdk_lib.geo_sdk_point_distance_surface_with_elevation_m(self._sdk_handle, other._sdk_handle, ctypes.byref(out)),
+                       "geo_sdk_point_distance_surface_with_elevation_m failed")
+            else:
+                _check(_sdk_lib.geo_sdk_point_distance_surface_m(self._sdk_handle, other._sdk_handle, ctypes.byref(out)),
+                       "geo_sdk_point_distance_surface_m failed")
         else:
-            _check(_lib.geo_point_distance_surface_m_wgs84(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
-                   "geo_point_distance_surface_m_wgs84 failed")
+            if include_elevation:
+                _check(_lib.geo_point_distance_surface_with_elevation_m_wgs84(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
+                       "geo_point_distance_surface_with_elevation_m_wgs84 failed")
+            else:
+                _check(_lib.geo_point_distance_surface_m_wgs84(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
+                       "geo_point_distance_surface_m_wgs84 failed")
         return float(out.value)
-
 
 def _as_point_array(points: list[Point]):
     arr_t = GeoPoint * len(points)
     arr = arr_t()
     for i, p in enumerate(points):
-        arr[i] = p._point
+        if getattr(p, "_use_sdk", False):
+            _check(_sdk_lib.geo_sdk_point_export_raw(p._sdk_handle, ctypes.byref(arr[i])), "geo_sdk_point_export_raw failed")
+        else:
+            arr[i] = p._point
     return arr
 
 

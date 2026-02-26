@@ -66,11 +66,50 @@ See Python entry points:
 Header-only C++ wrappers are available under `include/geo_cpp/`:
 
 - `geo_cpp/point.hpp` (`geo::Point`)
+  - transparent mutability semantics: editing LLH/UTM/MGRS/Geohash updates underlying ECEF and lazily rehydrates other formats on demand.
 - `geo_cpp/crs.hpp` (`geo::CRS`)
 - `geo_cpp/imagery.hpp` (`geo::TiePointAffineModel`)
 - `geo_cpp/geotools.hpp` umbrella include
 
 These wrap the stable C ABI and throw `geo::GeoError` on non-`GEO_OK` results.
+
+Additional wrappers now include:
+- `geo_cpp/geodesy.hpp` (`geo::Geodesy`) for inverse/direct/interpolate geodesic operations.
+- `geo_cpp/polyline.hpp` (`geo::Polyline`) for length, nearest distance, and distance-parameterized position.
+
+
+## API documentation single source-of-truth
+
+API docs now use `docs/api_reference_catalog.json` as the single source-of-truth.
+Generated artifacts:
+- `docs/API_REFERENCE.md` (human-readable API reference)
+- `tools/geotools_cli_help.inc` (CLI command help text)
+
+Regenerate after API changes:
+
+```bash
+python tools/build_api_artifacts.py
+```
+
+## Native CLI utility
+
+A compiled CLI is provided at `tools/geotools_cli.c` for quick terminal access to core geotools functions.
+
+Build:
+
+```bash
+cc -O2 -Iinclude tools/geotools_cli.c csrc/*.c -o geotools-cli -lm -pthread
+```
+
+Usage examples:
+
+```bash
+./geotools-cli llh-to-ecef 37.7749 -122.4194 10
+./geotools-cli ecef-to-llh -2706174.847 -4261059.489 3885734.679
+./geotools-cli llh-to-utm 37.7749 -122.4194
+./geotools-cli distance-surface 37.7749 -122.4194 34.0522 -118.2437
+./geotools-cli help llh-to-ecef
+```
 
 ## Microservice example (Phase 4)
 
