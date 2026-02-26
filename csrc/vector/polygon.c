@@ -48,7 +48,7 @@ static int ring_contains(const geo_llh_t* ring, size_t n, const geo_llh_t* p) {
     return inside;
 }
 
-geo_status_t geo_polygon_area_m2_wgs84(const geo_llh_t* outer, size_t outer_count,
+geo_status_t geo_polygon_area_m2(const geo_llh_t* outer, size_t outer_count,
                                        const geo_llh_t* holes, const size_t* hole_offsets,
                                        const size_t* hole_counts, size_t hole_count,
                                        double* out_area_m2) {
@@ -63,10 +63,11 @@ geo_status_t geo_polygon_area_m2_wgs84(const geo_llh_t* outer, size_t outer_coun
     return GEO_OK;
 }
 
-geo_status_t geo_polygon_contains_wgs84(const geo_llh_t* outer, size_t outer_count,
+geo_status_t geo_polygon_contains(const geo_ellipsoid_t* ellip,const geo_llh_t* outer, size_t outer_count,
                                         const geo_llh_t* holes, const size_t* hole_offsets,
                                         const size_t* hole_counts, size_t hole_count,
-                                        const geo_llh_t* point, int* out_inside) {
+                                        const geo_llh_t* point, const geo_compute_opts_t* opts, int* out_inside) {
+    (void)ellip; (void)opts;
     size_t i;
     if (!outer || !point || !out_inside || outer_count < 3) return GEO_ERR_PARSE;
     if (!ring_contains(outer, outer_count, point)) { *out_inside = 0; return GEO_OK; }
@@ -77,7 +78,7 @@ geo_status_t geo_polygon_contains_wgs84(const geo_llh_t* outer, size_t outer_cou
     return GEO_OK;
 }
 
-geo_status_t geo_polygon_distance_to_point_wgs84(const geo_llh_t* outer, size_t outer_count,
+static geo_status_t geo_polygon_distance_to_edge_ex(const geo_ellipsoid_t* ellip,const geo_llh_t* outer, size_t outer_count,
                                                  const geo_llh_t* holes, const size_t* hole_offsets,
                                                  const size_t* hole_counts, size_t hole_count,
                                                  const geo_llh_t* point,
@@ -87,7 +88,9 @@ geo_status_t geo_polygon_distance_to_point_wgs84(const geo_llh_t* outer, size_t 
                                                  geo_llh_t* out_nearest_v1,
                                                  geo_llh_t* out_nearest_v2,
                                                  int* out_inside,
-                                                 double* out_distance_m) {
+                                                 const geo_compute_opts_t* opts,
+                                                         double* out_distance_m) {
+    (void)ellip; (void)opts;
     size_t i,j;
     double best = 1e300;
     const geo_llh_t* rings[256];
@@ -124,7 +127,7 @@ geo_status_t geo_polygon_distance_to_point_wgs84(const geo_llh_t* outer, size_t 
     if (want_two_nearest_vertices && out_nearest_v1 && out_nearest_v2) {
         for (i=0;i<outer_count;i++) {
             double d;
-            geo_status_t st = geo_llh_distance_surface_m_wgs84(point, &outer[i], &d);
+            geo_status_t st = geo_llh_distance_surface_m(point, &outer[i], &d);
             if (st != GEO_OK) return st;
             if (d < bd1) { bd2 = bd1; best_v2 = best_v1; bd1 = d; best_v1 = outer[i]; }
             else if (d < bd2) { bd2 = d; best_v2 = outer[i]; }
@@ -134,7 +137,7 @@ geo_status_t geo_polygon_distance_to_point_wgs84(const geo_llh_t* outer, size_t 
     }
 
     if (out_inside) {
-        geo_status_t st = geo_polygon_contains_wgs84(outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, &inside);
+        geo_status_t st = geo_polygon_contains(NULL, outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, NULL, &inside);
         if (st != GEO_OK) return st;
         *out_inside = inside;
     }
@@ -143,7 +146,12 @@ geo_status_t geo_polygon_distance_to_point_wgs84(const geo_llh_t* outer, size_t 
     return GEO_OK;
 }
 
-geo_status_t geo_multipolygon_area_m2_wgs84(const geo_llh_t* outers, const size_t* outer_offsets,
+
+geo_status_t geo_polygon_distance_to_edge(const geo_ellipsoid_t* ellip,const geo_llh_t* outer,size_t outer_count,const geo_llh_t* holes,const size_t* hole_offsets,const size_t* hole_counts,size_t hole_count,const geo_llh_t* point,const geo_compute_opts_t* opts,double* out_distance_m){
+  return geo_polygon_distance_to_edge_ex(ellip,outer,outer_count,holes,hole_offsets,hole_counts,hole_count,point,0,NULL,0,NULL,NULL,NULL,opts,out_distance_m);
+}
+
+geo_status_t geo_multipolygon_area_m2(const geo_llh_t* outers, const size_t* outer_offsets,
                                             const size_t* outer_counts, size_t polygon_count,
                                             double* out_area_m2) {
     size_t i; double s=0.0;
@@ -167,7 +175,7 @@ static p2_t line_inter(p2_t s,p2_t e,p2_t a,p2_t b) {
     return r;
 }
 
-geo_status_t geo_polygon_intersection_convex_wgs84(const geo_llh_t* a, size_t a_count,
+geo_status_t geo_polygon_intersection_convex(const geo_llh_t* a, size_t a_count,
                                                    const geo_llh_t* b, size_t b_count,
                                                    geo_llh_t* out_points, size_t out_capacity,
                                                    size_t* out_count) {
@@ -211,7 +219,7 @@ static int cmp_p(const void* aa,const void* bb){
 }
 static double cross(p2_t o,p2_t a,p2_t b){ return (a.x-o.x)*(b.y-o.y)-(a.y-o.y)*(b.x-o.x); }
 
-geo_status_t geo_polygon_union_convex_wgs84(const geo_llh_t* a, size_t a_count,
+geo_status_t geo_polygon_union_convex(const geo_llh_t* a, size_t a_count,
                                             const geo_llh_t* b, size_t b_count,
                                             geo_llh_t* out_points, size_t out_capacity,
                                             size_t* out_count) {
@@ -233,13 +241,13 @@ geo_status_t geo_polygon_union_convex_wgs84(const geo_llh_t* a, size_t a_count,
     return GEO_OK;
 }
 
-geo_status_t geo_polygon_difference_convex_wgs84(const geo_llh_t* a, size_t a_count,
+geo_status_t geo_polygon_difference_convex(const geo_llh_t* a, size_t a_count,
                                                  const geo_llh_t* b, size_t b_count,
                                                  geo_llh_t* out_points, size_t out_capacity,
                                                  size_t* out_count) {
     geo_llh_t inter[256]; size_t in=0;
     geo_status_t st;
-    st = geo_polygon_intersection_convex_wgs84(a,a_count,b,b_count,inter,256,&in);
+    st = geo_polygon_intersection_convex(a,a_count,b,b_count,inter,256,&in);
     if (st != GEO_OK) return st;
     if (in == 0) {
         if (a_count > out_capacity) return GEO_ERR_BUFFER_TOO_SMALL;
@@ -250,27 +258,27 @@ geo_status_t geo_polygon_difference_convex_wgs84(const geo_llh_t* a, size_t a_co
     return GEO_ERR_UNSUPPORTED;
 }
 
-geo_status_t geo_polygon_xor_convex_wgs84(const geo_llh_t* a, size_t a_count,
+geo_status_t geo_polygon_xor_convex(const geo_llh_t* a, size_t a_count,
                                           const geo_llh_t* b, size_t b_count,
                                           geo_llh_t* out_points, size_t out_capacity,
                                           size_t* out_count) {
     geo_llh_t inter[256]; size_t in=0;
     geo_status_t st;
-    st = geo_polygon_intersection_convex_wgs84(a,a_count,b,b_count,inter,256,&in);
+    st = geo_polygon_intersection_convex(a,a_count,b,b_count,inter,256,&in);
     if (st != GEO_OK) return st;
-    if (in == 0) return geo_polygon_union_convex_wgs84(a,a_count,b,b_count,out_points,out_capacity,out_count);
+    if (in == 0) return geo_polygon_union_convex(a,a_count,b,b_count,out_points,out_capacity,out_count);
     return GEO_ERR_UNSUPPORTED;
 }
 
 
-geo_status_t geo_polygon_perimeter_m_wgs84(const geo_llh_t* outer, size_t outer_count,
+geo_status_t geo_polygon_perimeter_m(const geo_llh_t* outer, size_t outer_count,
                                             double* out_perimeter_m) {
     size_t i;
     double total = 0.0;
     if (!outer || !out_perimeter_m || outer_count < 3) return GEO_ERR_PARSE;
     for (i = 0; i < outer_count; i++) {
         double d;
-        geo_status_t st = geo_llh_distance_surface_m_wgs84(&outer[i], &outer[(i + 1u) % outer_count], &d);
+        geo_status_t st = geo_llh_distance_surface_m(&outer[i], &outer[(i + 1u) % outer_count], &d);
         if (st != GEO_OK) return st;
         total += d;
     }
@@ -278,7 +286,7 @@ geo_status_t geo_polygon_perimeter_m_wgs84(const geo_llh_t* outer, size_t outer_
     return GEO_OK;
 }
 
-geo_status_t geo_polygon_position_at_distance_wgs84(const geo_llh_t* outer, size_t outer_count,
+geo_status_t geo_polygon_position_at_distance(const geo_llh_t* outer, size_t outer_count,
                                                      double distance_m,
                                                      int from_end,
                                                      int cyclic,
@@ -289,7 +297,7 @@ geo_status_t geo_polygon_position_at_distance_wgs84(const geo_llh_t* outer, size
     if (!outer || !out_point || outer_count < 3) return GEO_ERR_PARSE;
     if (distance_m < 0.0) return GEO_ERR_RANGE;
 
-    if (geo_polygon_perimeter_m_wgs84(outer, outer_count, &perimeter) != GEO_OK) return GEO_ERR_PARSE;
+    if (geo_polygon_perimeter_m(outer, outer_count, &perimeter) != GEO_OK) return GEO_ERR_PARSE;
     if (perimeter <= 0.0) {
         *out_point = outer[0];
         return GEO_OK;
@@ -307,11 +315,11 @@ geo_status_t geo_polygon_position_at_distance_wgs84(const geo_llh_t* outer, size
             size_t idx = i - 1u;
             size_t prev = idx == 0 ? outer_count - 1u : idx - 1u;
             double seg;
-            geo_status_t st = geo_llh_distance_surface_m_wgs84(&outer[idx], &outer[prev], &seg);
+            geo_status_t st = geo_llh_distance_surface_m(&outer[idx], &outer[prev], &seg);
             if (st != GEO_OK) return st;
             if (remaining <= seg) {
                 double frac = seg == 0.0 ? 0.0 : (remaining / seg);
-                return geo_llh_geodesic_interpolate_wgs84(&outer[idx], &outer[prev], frac, out_point);
+                return geo_llh_geodesic_interpolate(&outer[idx], &outer[prev], frac, out_point);
             }
             remaining -= seg;
         }
@@ -319,11 +327,11 @@ geo_status_t geo_polygon_position_at_distance_wgs84(const geo_llh_t* outer, size
         for (i = 0; i < outer_count; i++) {
             size_t j = (i + 1u) % outer_count;
             double seg;
-            geo_status_t st = geo_llh_distance_surface_m_wgs84(&outer[i], &outer[j], &seg);
+            geo_status_t st = geo_llh_distance_surface_m(&outer[i], &outer[j], &seg);
             if (st != GEO_OK) return st;
             if (remaining <= seg) {
                 double frac = seg == 0.0 ? 0.0 : (remaining / seg);
-                return geo_llh_geodesic_interpolate_wgs84(&outer[i], &outer[j], frac, out_point);
+                return geo_llh_geodesic_interpolate(&outer[i], &outer[j], frac, out_point);
             }
             remaining -= seg;
         }

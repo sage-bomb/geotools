@@ -67,13 +67,13 @@ static int is_inside_buffered_polygon(const geo_llh_t* outer, size_t outer_count
     int inside = 0;
     double edge_distance = 0.0;
     geo_status_t st;
-    st = geo_polygon_contains_wgs84(outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, &inside);
+    st = geo_polygon_contains(NULL, outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, NULL, &inside);
     if (st != GEO_OK) {
         *out_status = st;
         return 0;
     }
-    st = geo_polygon_distance_to_point_wgs84(outer, outer_count, holes, hole_offsets, hole_counts, hole_count,
-                                             point, 0, NULL, 0, NULL, NULL, NULL, &edge_distance);
+    st = geo_polygon_distance_to_edge(NULL, outer, outer_count, holes, hole_offsets, hole_counts, hole_count,
+                                             point, NULL, &edge_distance);
     if (st != GEO_OK) {
         *out_status = st;
         return 0;
@@ -200,7 +200,7 @@ static geo_status_t gather_matches_indices(size_t count,
     return GEO_OK;
 }
 
-geo_status_t geo_bulk_points_init_from_llh_wgs84(geo_bulk_points_t* bulk,
+geo_status_t geo_bulk_points_init_from_llh(geo_bulk_points_t* bulk,
                                                   const uint64_t* ids,
                                                   const geo_llh_t* points,
                                                   size_t count) {
@@ -224,7 +224,7 @@ geo_status_t geo_bulk_points_init_from_llh_wgs84(geo_bulk_points_t* bulk,
     for (i = 0; i < count; i++) {
         geo_status_t st;
         bulk->ids[i] = ids[i];
-        st = geo_point_init_from_llh_wgs84(&bulk->points[i], &points[i]);
+        st = geo_point_init_from_llh(&bulk->points[i], &points[i]);
         if (st != GEO_OK) {
             geo_bulk_points_free(bulk);
             return st;
@@ -278,7 +278,7 @@ geo_status_t geo_bulk_points_free(geo_bulk_points_t* bulk) {
     return GEO_OK;
 }
 
-geo_status_t geo_bulk_points_to_llh_wgs84(const geo_bulk_points_t* bulk,
+geo_status_t geo_bulk_points_to_llh(const geo_bulk_points_t* bulk,
                                            geo_llh_t* out_points,
                                            size_t out_count) {
     size_t i;
@@ -301,7 +301,7 @@ geo_status_t geo_bulk_points_to_ecef(const geo_bulk_points_t* bulk,
     return GEO_OK;
 }
 
-geo_status_t geo_bulk_points_filter_proximity_wgs84(const geo_bulk_points_t* points,
+geo_status_t geo_bulk_points_filter_proximity(const geo_bulk_points_t* points,
                                                      const geo_llh_t* point_of_interest,
                                                      double buffer_m,
                                                      int include_within,
@@ -364,7 +364,7 @@ geo_status_t geo_bulk_points_filter_proximity_wgs84(const geo_bulk_points_t* poi
     }
 }
 
-geo_status_t geo_bulk_points_filter_polygon_wgs84(const geo_bulk_points_t* points,
+geo_status_t geo_bulk_points_filter_polygon(const geo_bulk_points_t* points,
                                                   const geo_llh_t* outer,
                                                   size_t outer_count,
                                                   const geo_llh_t* holes,
@@ -439,7 +439,7 @@ geo_status_t geo_bulk_points_filter_polygon_wgs84(const geo_bulk_points_t* point
     }
 }
 
-geo_status_t geo_filter_polygons_by_polygon_wgs84(const geo_llh_t* candidate_outers,
+geo_status_t geo_filter_polygons_by_polygon(const geo_llh_t* candidate_outers,
                                                   const size_t* candidate_offsets,
                                                   const size_t* candidate_counts,
                                                   size_t candidate_count,

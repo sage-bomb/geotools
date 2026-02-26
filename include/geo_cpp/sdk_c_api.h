@@ -32,31 +32,31 @@ GEO_API geo_status_t geo_sdk_point_distance_surface_with_elevation_m(const geo_s
 GEO_API geo_status_t geo_sdk_point_export_raw(const geo_sdk_point_t* p, geo_point_t* out);
 
 /* SDK-routed conversion/compute APIs for Python wrapper single-path routing */
-GEO_API geo_status_t geo_sdk_llh_to_ecef_wgs84(const geo_llh_t* llh, geo_ecef_t* out);
-GEO_API geo_status_t geo_sdk_ecef_to_llh_wgs84(const geo_ecef_t* ecef, geo_llh_t* out);
-GEO_API geo_status_t geo_sdk_ll_to_utm_wgs84(double lat_deg, double lon_deg, geo_utm_t* out);
-GEO_API geo_status_t geo_sdk_utm_to_ll_wgs84(const geo_utm_t* utm, geo_llh_t* out);
-GEO_API geo_status_t geo_sdk_utm_to_ecef_wgs84(const geo_utm_t* utm, double h_m, geo_ecef_t* out);
-GEO_API geo_status_t geo_sdk_ecef_to_utm_wgs84(const geo_ecef_t* ecef, geo_utm_t* out);
-GEO_API geo_status_t geo_sdk_ll_to_mgrs_wgs84(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz);
-GEO_API geo_status_t geo_sdk_mgrs_to_ll_wgs84(const char* mgrs_str, geo_llh_t* out);
-GEO_API geo_status_t geo_sdk_mgrs_to_ecef_wgs84(const char* mgrs_str, double h_m, geo_ecef_t* out);
-GEO_API geo_status_t geo_sdk_ecef_to_mgrs_wgs84(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz);
-GEO_API geo_status_t geo_sdk_ll_to_geohash_wgs84(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz);
-GEO_API geo_status_t geo_sdk_geohash_to_ll_wgs84(const char* geohash, geo_llh_t* out);
-GEO_API geo_status_t geo_sdk_geohash_to_ecef_wgs84(const char* geohash, double h_m, geo_ecef_t* out);
-GEO_API geo_status_t geo_sdk_ecef_to_geohash_wgs84(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz);
+GEO_API geo_status_t geo_sdk_llh_to_ecef(const geo_llh_t* llh, geo_ecef_t* out);
+GEO_API geo_status_t geo_sdk_ecef_to_llh(const geo_ecef_t* ecef, geo_llh_t* out);
+GEO_API geo_status_t geo_sdk_ll_to_utm(double lat_deg, double lon_deg, geo_utm_t* out);
+GEO_API geo_status_t geo_sdk_utm_to_ll(const geo_utm_t* utm, geo_llh_t* out);
+GEO_API geo_status_t geo_sdk_utm_to_ecef(const geo_utm_t* utm, double h_m, geo_ecef_t* out);
+GEO_API geo_status_t geo_sdk_ecef_to_utm(const geo_ecef_t* ecef, geo_utm_t* out);
+GEO_API geo_status_t geo_sdk_ll_to_mgrs(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz);
+GEO_API geo_status_t geo_sdk_mgrs_to_ll(const char* mgrs_str, geo_llh_t* out);
+GEO_API geo_status_t geo_sdk_mgrs_to_ecef(const char* mgrs_str, double h_m, geo_ecef_t* out);
+GEO_API geo_status_t geo_sdk_ecef_to_mgrs(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz);
+GEO_API geo_status_t geo_sdk_ll_to_geohash(double lat_deg, double lon_deg, int precision, char* out_str, size_t out_sz);
+GEO_API geo_status_t geo_sdk_geohash_to_ll(const char* geohash, geo_llh_t* out);
+GEO_API geo_status_t geo_sdk_geohash_to_ecef(const char* geohash, double h_m, geo_ecef_t* out);
+GEO_API geo_status_t geo_sdk_ecef_to_geohash(const geo_ecef_t* ecef, int precision, char* out_str, size_t out_sz);
 GEO_API geo_status_t geo_sdk_ecef_distance_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
-GEO_API geo_status_t geo_sdk_ecef_distance_surface_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
-GEO_API geo_status_t geo_sdk_ecef_distance_surface_with_elevation_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
-GEO_API geo_status_t geo_sdk_llh_geodesic_inverse_wgs84(const geo_llh_t* a, const geo_llh_t* b, geo_geodesic_inverse_result_t* out);
-GEO_API geo_status_t geo_sdk_llh_geodesic_direct_wgs84(const geo_llh_t* start, double initial_bearing_deg, double distance_m, geo_llh_t* out_end);
-GEO_API geo_status_t geo_sdk_llh_geodesic_interpolate_wgs84(const geo_llh_t* a, const geo_llh_t* b, double fraction, geo_llh_t* out);
+GEO_API geo_status_t geo_sdk_ecef_distance_surface_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
+GEO_API geo_status_t geo_sdk_ecef_distance_surface_with_elevation_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
+GEO_API geo_status_t geo_sdk_llh_geodesic_inverse(const geo_llh_t* a, const geo_llh_t* b, geo_geodesic_inverse_result_t* out);
+GEO_API geo_status_t geo_sdk_llh_geodesic_direct(const geo_llh_t* start, double initial_bearing_deg, double distance_m, geo_llh_t* out_end);
+GEO_API geo_status_t geo_sdk_llh_geodesic_interpolate(const geo_llh_t* a, const geo_llh_t* b, double fraction, geo_llh_t* out);
 GEO_API geo_status_t geo_sdk_crs_from_epsg(int epsg, geo_crs_t* out);
 GEO_API geo_status_t geo_sdk_crs_normalize_epsg(int epsg, int* out_epsg);
-GEO_API geo_status_t geo_sdk_imagery_fit_affine_tie_points_wgs84(const geo_tie_point_t* points, size_t count, geo_tie_point_affine_model_t* out_model, geo_tie_point_fit_stats_t* out_stats);
-GEO_API geo_status_t geo_sdk_imagery_project_pixel_wgs84(const geo_tie_point_affine_model_t* model, double image_px, double image_py, geo_llh_t* out_llh);
-GEO_API geo_status_t geo_sdk_imagery_solve_tie_points_wgs84(const geo_tie_point_t* points, size_t count, geo_tie_point_fit_stats_t* out_stats);
+GEO_API geo_status_t geo_sdk_imagery_fit_affine_tie_points(const geo_tie_point_t* points, size_t count, geo_tie_point_affine_model_t* out_model, geo_tie_point_fit_stats_t* out_stats);
+GEO_API geo_status_t geo_sdk_imagery_project_pixel(const geo_tie_point_affine_model_t* model, double image_px, double image_py, geo_llh_t* out_llh);
+GEO_API geo_status_t geo_sdk_imagery_solve_tie_points(const geo_tie_point_t* points, size_t count, geo_tie_point_fit_stats_t* out_stats);
 
 #ifdef __cplusplus
 }

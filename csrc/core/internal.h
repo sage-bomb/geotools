@@ -10,9 +10,9 @@ typedef struct {
     double b;
     double e2;
     double ep2;
-} wgs84_ellipsoid_t;
+} geo_internal_ellipsoid_t;
 
-const wgs84_ellipsoid_t* geo_wgs84_ellipsoid(void);
+const geo_internal_ellipsoid_t* geo_ellipsoid(void);
 
 double geo_deg2rad(double d);
 double geo_rad2deg(double r);
@@ -46,8 +46,14 @@ geo_status_t geo_geohash_to_ll_impl(const char* geohash, geo_llh_t* out_ll);
 geo_status_t geo_geohash_to_ecef_impl(const char* geohash, double h_m, geo_ecef_t* out_ecef);
 geo_status_t geo_ecef_to_geohash_impl(const geo_ecef_t* ecef, int precision, char* out, size_t out_sz);
 
-geo_status_t geo_ecef_distance_surface_impl_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
-geo_status_t geo_ecef_distance_surface_with_elevation_impl_wgs84(const geo_ecef_t* a, const geo_ecef_t* b,
+geo_status_t geo_ecef_distance_surface_impl(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
+geo_status_t geo_ecef_distance_surface_with_elevation_impl(const geo_ecef_t* a, const geo_ecef_t* b,
                                                                   double* out_m);
 
 #endif
+
+
+typedef struct { double distance_m, initial_bearing_deg, final_bearing_deg; } geo_geodesic_inverse_result_t;
+geo_status_t geo_llh_geodesic_inverse(const geo_llh_t* a,const geo_llh_t* b,geo_geodesic_inverse_result_t* out);
+geo_status_t geo_llh_geodesic_direct(const geo_llh_t* a,double az,double dist,geo_llh_t* out);
+geo_status_t geo_llh_geodesic_interpolate(const geo_llh_t* a,const geo_llh_t* b,double f,geo_llh_t* out);

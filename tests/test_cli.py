@@ -67,4 +67,4 @@ def test_cli_help_for_command():
     proc = subprocess.run([str(exe), "help", "llh-to-ecef"], cwd=repo, text=True, capture_output=True, check=True)
     out = proc.stdout + proc.stderr
     assert "Usage:" in out
-    assert "geo_llh_to_ecef_wgs84" in out
+    assert "geo_llh_to_ecef" in out

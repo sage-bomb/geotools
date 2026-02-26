@@ -10,9 +10,9 @@
 #define GEO_VINCENTY_EPS 1e-12
 #endif
 
-static geo_status_t vincenty_inverse_wgs84(double lat1, double lon1, double lat2, double lon2,
+static geo_status_t vincenty_inverse(double lat1, double lon1, double lat2, double lon2,
                                            double* out_s) {
-    const wgs84_ellipsoid_t* w = geo_wgs84_ellipsoid();
+    const geo_internal_ellipsoid_t* w = geo_ellipsoid();
     double U1 = atan((1.0 - w->f) * tan(lat1));
     double U2 = atan((1.0 - w->f) * tan(lat2));
     double L = lon2 - lon1;
@@ -88,7 +88,7 @@ static geo_status_t vincenty_inverse_wgs84(double lat1, double lon1, double lat2
     return GEO_ERR_UNSUPPORTED;
 }
 
-geo_status_t geo_ecef_distance_surface_impl_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m) {
+geo_status_t geo_ecef_distance_surface_impl(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m) {
     geo_llh_t llh_a;
     geo_llh_t llh_b;
     geo_status_t st;
@@ -101,11 +101,11 @@ geo_status_t geo_ecef_distance_surface_impl_wgs84(const geo_ecef_t* a, const geo
     st = geo_ecef_to_llh_impl(b, &llh_b);
     if (st != GEO_OK) return st;
 
-    return vincenty_inverse_wgs84(geo_deg2rad(llh_a.lat_deg), geo_deg2rad(llh_a.lon_deg),
+    return vincenty_inverse(geo_deg2rad(llh_a.lat_deg), geo_deg2rad(llh_a.lon_deg),
                                   geo_deg2rad(llh_b.lat_deg), geo_deg2rad(llh_b.lon_deg), out_m);
 }
 
-geo_status_t geo_ecef_distance_surface_with_elevation_impl_wgs84(const geo_ecef_t* a, const geo_ecef_t* b,
+geo_status_t geo_ecef_distance_surface_with_elevation_impl(const geo_ecef_t* a, const geo_ecef_t* b,
                                                                   double* out_m) {
     geo_llh_t llh_a;
     geo_llh_t llh_b;
@@ -121,7 +121,7 @@ geo_status_t geo_ecef_distance_surface_with_elevation_impl_wgs84(const geo_ecef_
     st = geo_ecef_to_llh_impl(b, &llh_b);
     if (st != GEO_OK) return st;
 
-    st = vincenty_inverse_wgs84(geo_deg2rad(llh_a.lat_deg), geo_deg2rad(llh_a.lon_deg),
+    st = vincenty_inverse(geo_deg2rad(llh_a.lat_deg), geo_deg2rad(llh_a.lon_deg),
                                 geo_deg2rad(llh_b.lat_deg), geo_deg2rad(llh_b.lon_deg), &surface);
     if (st != GEO_OK) return st;
 
@@ -130,7 +130,7 @@ geo_status_t geo_ecef_distance_surface_with_elevation_impl_wgs84(const geo_ecef_
     return GEO_OK;
 }
 
-geo_status_t geo_llh_distance_surface_m_wgs84(const geo_llh_t* a, const geo_llh_t* b, double* out_m) {
+geo_status_t geo_llh_distance_surface_m(const geo_llh_t* a, const geo_llh_t* b, double* out_m) {
     geo_ecef_t ea;
     geo_ecef_t eb;
     geo_status_t st;
@@ -143,5 +143,5 @@ geo_status_t geo_llh_distance_surface_m_wgs84(const geo_llh_t* a, const geo_llh_
     st = geo_llh_to_ecef_impl(b, &eb);
     if (st != GEO_OK) return st;
 
-    return geo_ecef_distance_surface_impl_wgs84(&ea, &eb, out_m);
+    return geo_ecef_distance_surface_impl(&ea, &eb, out_m);
 }

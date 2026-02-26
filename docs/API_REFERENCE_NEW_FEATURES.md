@@ -23,7 +23,7 @@ All functions are WGS84-based.
 
 #### Bulk container lifecycle
 
-- `geo_bulk_points_init_from_llh_wgs84(geo_bulk_points_t* bulk, const uint64_t* ids, const geo_llh_t* points, size_t count)`
+- `geo_bulk_points_init_from_llh(geo_bulk_points_t* bulk, const uint64_t* ids, const geo_llh_t* points, size_t count)`
 - `geo_bulk_points_init_from_ecef(geo_bulk_points_t* bulk, const uint64_t* ids, const geo_ecef_t* points, size_t count)`
 - `geo_bulk_points_free(geo_bulk_points_t* bulk)`
 
@@ -31,23 +31,23 @@ All functions are WGS84-based.
 
 #### Bulk coordinate conversion
 
-- `geo_bulk_points_to_llh_wgs84(const geo_bulk_points_t* bulk, geo_llh_t* out_points, size_t out_count)`
+- `geo_bulk_points_to_llh(const geo_bulk_points_t* bulk, geo_llh_t* out_points, size_t out_count)`
 - `geo_bulk_points_to_ecef(const geo_bulk_points_t* bulk, geo_ecef_t* out_points, size_t out_count)`
 
 #### Bulk point relationship filters
 
-- `geo_bulk_points_filter_proximity_wgs84(const geo_bulk_points_t* points, const geo_llh_t* point_of_interest, double buffer_m, int include_within, size_t thread_count, uint64_t* out_ids, size_t out_capacity, size_t* out_count)`
+- `geo_bulk_points_filter_proximity(const geo_bulk_points_t* points, const geo_llh_t* point_of_interest, double buffer_m, int include_within, size_t thread_count, uint64_t* out_ids, size_t out_capacity, size_t* out_count)`
   - `include_within=1` => return points inside buffer
   - `include_within=0` => return points outside buffer
 
-- `geo_bulk_points_filter_polygon_wgs84(const geo_bulk_points_t* points, const geo_llh_t* outer, size_t outer_count, const geo_llh_t* holes, const size_t* hole_offsets, const size_t* hole_counts, size_t hole_count, double buffer_m, int include_inside, size_t thread_count, uint64_t* out_ids, size_t out_capacity, size_t* out_count)`
+- `geo_bulk_points_filter_polygon(const geo_bulk_points_t* points, const geo_llh_t* outer, size_t outer_count, const geo_llh_t* holes, const size_t* hole_offsets, const size_t* hole_counts, size_t hole_count, double buffer_m, int include_inside, size_t thread_count, uint64_t* out_ids, size_t out_capacity, size_t* out_count)`
   - Supports positive/negative polygon buffer semantics
   - `include_inside=1` => return inside set
   - `include_inside=0` => return outside set
 
 #### Polygon-vs-polygon filtering
 
-- `geo_filter_polygons_by_polygon_wgs84(const geo_llh_t* candidate_outers, const size_t* candidate_offsets, const size_t* candidate_counts, size_t candidate_count, const geo_llh_t* interest_outer, size_t interest_outer_count, double interest_buffer_m, int require_full_containment, int include_inside, size_t thread_count, size_t* out_indices, size_t out_capacity, size_t* out_count)`
+- `geo_filter_polygons_by_polygon(const geo_llh_t* candidate_outers, const size_t* candidate_offsets, const size_t* candidate_counts, size_t candidate_count, const geo_llh_t* interest_outer, size_t interest_outer_count, double interest_buffer_m, int require_full_containment, int include_inside, size_t thread_count, size_t* out_indices, size_t out_capacity, size_t* out_count)`
   - `require_full_containment=1`: every vertex must satisfy inclusion
   - `require_full_containment=0`: partial overlap/inside accepted
 
@@ -60,9 +60,9 @@ All functions are WGS84-based.
 
 ### Polyline functions (`geo/polyline.h`)
 
-- `geo_polyline_length_m_wgs84(const geo_llh_t* points, size_t point_count, double* out_length_m)`
-- `geo_polyline_distance_to_point_wgs84(const geo_llh_t* points, size_t point_count, const geo_llh_t* point, int want_nearest_point, geo_llh_t* out_nearest_point, double* out_distance_m)`
-- `geo_polyline_position_at_distance_wgs84(const geo_llh_t* points, size_t point_count, double distance_m, int from_end, geo_llh_t* out_point)`
+- `geo_polyline_length_m(const geo_llh_t* points, size_t point_count, double* out_length_m)`
+- `geo_polyline_distance_to_point(const geo_llh_t* points, size_t point_count, const geo_llh_t* point, int want_nearest_point, geo_llh_t* out_nearest_point, double* out_distance_m)`
+- `geo_polyline_position_at_distance(const geo_llh_t* points, size_t point_count, double distance_m, int from_end, geo_llh_t* out_point)`
 
 Notes:
 
@@ -75,8 +75,8 @@ Notes:
 
 ### Polygon additions (`geo/polygon.h`)
 
-- `geo_polygon_perimeter_m_wgs84(const geo_llh_t* outer, size_t outer_count, double* out_perimeter_m)`
-- `geo_polygon_position_at_distance_wgs84(const geo_llh_t* outer, size_t outer_count, double distance_m, int from_end, int cyclic, geo_llh_t* out_point)`
+- `geo_polygon_perimeter_m(const geo_llh_t* outer, size_t outer_count, double* out_perimeter_m)`
+- `geo_polygon_position_at_distance(const geo_llh_t* outer, size_t outer_count, double distance_m, int from_end, int cyclic, geo_llh_t* out_point)`
 
 Notes:
 

@@ -18,10 +18,10 @@ def test_geodesic_inverse_and_direct_roundtrip():
     a_lat, a_lon = 37.7749, -122.4194
     b_lat, b_lon = 34.0522, -118.2437
 
-    inv = g.geodesic_inverse_wgs84(a_lat, a_lon, b_lat, b_lon)
+    inv = g.geodesic_inverse(a_lat, a_lon, b_lat, b_lon)
     assert 540_000 <= inv["distance_m"] <= 580_000
 
-    lat2, lon2, _ = g.geodesic_direct_wgs84(
+    lat2, lon2, _ = g.geodesic_direct(
         a_lat,
         a_lon,
         inv["initial_bearing_deg"],
@@ -36,10 +36,10 @@ def test_geodesic_interpolate_midpoint_is_half_distanceish():
     a_lat, a_lon = 40.7128, -74.0060
     b_lat, b_lon = 51.5074, -0.1278
 
-    total = g.geodesic_inverse_wgs84(a_lat, a_lon, b_lat, b_lon)["distance_m"]
-    m_lat, m_lon, _ = g.geodesic_interpolate_wgs84(a_lat, a_lon, b_lat, b_lon, 0.5)
-    d1 = g.geodesic_inverse_wgs84(a_lat, a_lon, m_lat, m_lon)["distance_m"]
-    d2 = g.geodesic_inverse_wgs84(m_lat, m_lon, b_lat, b_lon)["distance_m"]
+    total = g.geodesic_inverse(a_lat, a_lon, b_lat, b_lon)["distance_m"]
+    m_lat, m_lon, _ = g.geodesic_interpolate(a_lat, a_lon, b_lat, b_lon, 0.5)
+    d1 = g.geodesic_inverse(a_lat, a_lon, m_lat, m_lon)["distance_m"]
+    d2 = g.geodesic_inverse(m_lat, m_lon, b_lat, b_lon)["distance_m"]
 
     assert abs((d1 + d2) - total) / total < 1e-6
     assert abs(d1 - d2) / total < 1e-3
@@ -59,10 +59,10 @@ def test_crs_support_and_normalization():
 
 def test_imagery_phase2_symbols_exposed_from_python_and_c_api():
     lib = gg._lib
-    assert hasattr(lib, "geo_imagery_solve_tie_points_wgs84")
-    assert hasattr(lib, "geo_imagery_fit_affine_tie_points_wgs84")
-    assert hasattr(lib, "geo_imagery_project_pixel_wgs84")
+    assert hasattr(lib, "geo_imagery_solve_tie_points")
+    assert hasattr(lib, "geo_imagery_fit_affine_tie_points")
+    assert hasattr(lib, "geo_imagery_project_pixel")
 
-    assert callable(g.imagery_solve_tie_points_wgs84)
-    assert callable(g.imagery_fit_affine_tie_points_wgs84)
-    assert callable(g.imagery_project_pixel_wgs84)
+    assert callable(g.imagery_solve_tie_points)
+    assert callable(g.imagery_fit_affine_tie_points)
+    assert callable(g.imagery_project_pixel)

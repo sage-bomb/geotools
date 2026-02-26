@@ -126,8 +126,8 @@ def load_geo_api(lib_path: Optional[str]):
     # Heuristic: the module might expose functions directly or via a class.
     # We build a tiny adapter with the two functions we need.
     # Expected signatures:
-    #   geo_llh_to_ecef_wgs84(lat_deg, lon_deg, h_m) -> (x_m, y_m, z_m)
-    #   geo_ecef_to_llh_wgs84(x_m, y_m, z_m) -> (lat_deg, lon_deg, h_m)
+    #   geo_llh_to_ecef(lat_deg, lon_deg, h_m) -> (x_m, y_m, z_m)
+    #   geo_ecef_to_llh(x_m, y_m, z_m) -> (lat_deg, lon_deg, h_m)
     #
     # If your wrapper returns dicts/objects, adapt here.
 
@@ -137,21 +137,21 @@ def load_geo_api(lib_path: Optional[str]):
                 return getattr(mod, n)
         return None
 
-    f_llh_to_ecef = pick_attr("geo_llh_to_ecef_wgs84", "llh_to_ecef_wgs84", "llh_to_ecef")
-    f_ecef_to_llh = pick_attr("geo_ecef_to_llh_wgs84", "ecef_to_llh_wgs84", "ecef_to_llh")
+    f_llh_to_ecef = pick_attr("geo_llh_to_ecef", "llh_to_ecef", "llh_to_ecef")
+    f_ecef_to_llh = pick_attr("geo_ecef_to_llh", "ecef_to_llh", "ecef_to_llh")
 
     if f_llh_to_ecef is None or f_ecef_to_llh is None:
         # Some wrappers expose a class/object
         maybe = pick_attr("GeoWGS84", "Geo", "geo")
         if maybe is not None:
             obj = maybe() if callable(maybe) else maybe
-            f_llh_to_ecef = getattr(obj, "geo_llh_to_ecef_wgs84", None) or getattr(obj, "llh_to_ecef_wgs84", None)
-            f_ecef_to_llh = getattr(obj, "geo_ecef_to_llh_wgs84", None) or getattr(obj, "ecef_to_llh_wgs84", None)
+            f_llh_to_ecef = getattr(obj, "geo_llh_to_ecef", None) or getattr(obj, "llh_to_ecef", None)
+            f_ecef_to_llh = getattr(obj, "geo_ecef_to_llh", None) or getattr(obj, "ecef_to_llh", None)
 
     if f_llh_to_ecef is None or f_ecef_to_llh is None:
         raise RuntimeError(
             "Wrapper imported, but could not find expected functions. "
-            "Expected geo_llh_to_ecef_wgs84 and geo_ecef_to_llh_wgs84 (or similar)."
+            "Expected geo_llh_to_ecef and geo_ecef_to_llh (or similar)."
         )
 
     # Optional: if your wrapper supports selecting a shared library path, handle here.

@@ -165,13 +165,13 @@ def convert_ecef_llh(req: ECEFIn):
 
 @app.post("/imagery/fit-affine")
 def imagery_fit(req: TiePointFitRequest):
-    model, stats = g.imagery_fit_affine_tie_points_wgs84([tp.model_dump() for tp in req.tie_points])
+    model, stats = g.imagery_fit_affine_tie_points([tp.model_dump() for tp in req.tie_points])
     return {"model": model, "stats": stats}
 
 
 @app.post("/imagery/project-pixel")
 def imagery_project(req: PixelProjectRequest):
-    lat, lon, h = g.imagery_project_pixel_wgs84(req.model, req.image_px, req.image_py)
+    lat, lon, h = g.imagery_project_pixel(req.model, req.image_px, req.image_py)
     return {"lat_deg": lat, "lon_deg": lon, "h_m": h}
 
 

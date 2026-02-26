@@ -219,73 +219,73 @@ if _sdk_lib is not None:
     _sdk_lib.geo_sdk_point_export_raw.argtypes = [c_void_p, POINTER(GeoPoint)]
     _sdk_lib.geo_sdk_point_export_raw.restype = c_int
 
-    _sdk_lib.geo_sdk_llh_to_ecef_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoECEF)]
-    _sdk_lib.geo_sdk_llh_to_ecef_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ecef_to_llh_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoLLH)]
-    _sdk_lib.geo_sdk_ecef_to_llh_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ll_to_utm_wgs84.argtypes = [c_double, c_double, POINTER(GeoUTM)]
-    _sdk_lib.geo_sdk_ll_to_utm_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_utm_to_ll_wgs84.argtypes = [POINTER(GeoUTM), POINTER(GeoLLH)]
-    _sdk_lib.geo_sdk_utm_to_ll_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_utm_to_ecef_wgs84.argtypes = [POINTER(GeoUTM), c_double, POINTER(GeoECEF)]
-    _sdk_lib.geo_sdk_utm_to_ecef_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ecef_to_utm_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoUTM)]
-    _sdk_lib.geo_sdk_ecef_to_utm_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ll_to_mgrs_wgs84.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
-    _sdk_lib.geo_sdk_ll_to_mgrs_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_mgrs_to_ll_wgs84.argtypes = [c_char_p, POINTER(GeoLLH)]
-    _sdk_lib.geo_sdk_mgrs_to_ll_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_mgrs_to_ecef_wgs84.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
-    _sdk_lib.geo_sdk_mgrs_to_ecef_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ecef_to_mgrs_wgs84.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
-    _sdk_lib.geo_sdk_ecef_to_mgrs_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ll_to_geohash_wgs84.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
-    _sdk_lib.geo_sdk_ll_to_geohash_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_geohash_to_ll_wgs84.argtypes = [c_char_p, POINTER(GeoLLH)]
-    _sdk_lib.geo_sdk_geohash_to_ll_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_geohash_to_ecef_wgs84.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
-    _sdk_lib.geo_sdk_geohash_to_ecef_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ecef_to_geohash_wgs84.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
-    _sdk_lib.geo_sdk_ecef_to_geohash_wgs84.restype = c_int
+    _sdk_lib.geo_sdk_llh_to_ecef.argtypes = [POINTER(GeoLLH), POINTER(GeoECEF)]
+    _sdk_lib.geo_sdk_llh_to_ecef.restype = c_int
+    _sdk_lib.geo_sdk_ecef_to_llh.argtypes = [POINTER(GeoECEF), POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_ecef_to_llh.restype = c_int
+    _sdk_lib.geo_sdk_ll_to_utm.argtypes = [c_double, c_double, POINTER(GeoUTM)]
+    _sdk_lib.geo_sdk_ll_to_utm.restype = c_int
+    _sdk_lib.geo_sdk_utm_to_ll.argtypes = [POINTER(GeoUTM), POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_utm_to_ll.restype = c_int
+    _sdk_lib.geo_sdk_utm_to_ecef.argtypes = [POINTER(GeoUTM), c_double, POINTER(GeoECEF)]
+    _sdk_lib.geo_sdk_utm_to_ecef.restype = c_int
+    _sdk_lib.geo_sdk_ecef_to_utm.argtypes = [POINTER(GeoECEF), POINTER(GeoUTM)]
+    _sdk_lib.geo_sdk_ecef_to_utm.restype = c_int
+    _sdk_lib.geo_sdk_ll_to_mgrs.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
+    _sdk_lib.geo_sdk_ll_to_mgrs.restype = c_int
+    _sdk_lib.geo_sdk_mgrs_to_ll.argtypes = [c_char_p, POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_mgrs_to_ll.restype = c_int
+    _sdk_lib.geo_sdk_mgrs_to_ecef.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
+    _sdk_lib.geo_sdk_mgrs_to_ecef.restype = c_int
+    _sdk_lib.geo_sdk_ecef_to_mgrs.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
+    _sdk_lib.geo_sdk_ecef_to_mgrs.restype = c_int
+    _sdk_lib.geo_sdk_ll_to_geohash.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
+    _sdk_lib.geo_sdk_ll_to_geohash.restype = c_int
+    _sdk_lib.geo_sdk_geohash_to_ll.argtypes = [c_char_p, POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_geohash_to_ll.restype = c_int
+    _sdk_lib.geo_sdk_geohash_to_ecef.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
+    _sdk_lib.geo_sdk_geohash_to_ecef.restype = c_int
+    _sdk_lib.geo_sdk_ecef_to_geohash.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
+    _sdk_lib.geo_sdk_ecef_to_geohash.restype = c_int
     _sdk_lib.geo_sdk_ecef_distance_m.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
     _sdk_lib.geo_sdk_ecef_distance_m.restype = c_int
-    _sdk_lib.geo_sdk_ecef_distance_surface_m_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
-    _sdk_lib.geo_sdk_ecef_distance_surface_m_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
-    _sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_llh_geodesic_inverse_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), POINTER(GeoGeodesicInverseResult)]
-    _sdk_lib.geo_sdk_llh_geodesic_inverse_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_llh_geodesic_direct_wgs84.argtypes = [POINTER(GeoLLH), c_double, c_double, POINTER(GeoLLH)]
-    _sdk_lib.geo_sdk_llh_geodesic_direct_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_llh_geodesic_interpolate_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), c_double, POINTER(GeoLLH)]
-    _sdk_lib.geo_sdk_llh_geodesic_interpolate_wgs84.restype = c_int
+    _sdk_lib.geo_sdk_ecef_distance_surface_m.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
+    _sdk_lib.geo_sdk_ecef_distance_surface_m.restype = c_int
+    _sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
+    _sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m.restype = c_int
+    _sdk_lib.geo_sdk_llh_geodesic_inverse.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), POINTER(GeoGeodesicInverseResult)]
+    _sdk_lib.geo_sdk_llh_geodesic_inverse.restype = c_int
+    _sdk_lib.geo_sdk_llh_geodesic_direct.argtypes = [POINTER(GeoLLH), c_double, c_double, POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_llh_geodesic_direct.restype = c_int
+    _sdk_lib.geo_sdk_llh_geodesic_interpolate.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), c_double, POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_llh_geodesic_interpolate.restype = c_int
     _sdk_lib.geo_sdk_crs_from_epsg.argtypes = [c_int, POINTER(GeoCRS)]
     _sdk_lib.geo_sdk_crs_from_epsg.restype = c_int
     _sdk_lib.geo_sdk_crs_normalize_epsg.argtypes = [c_int, POINTER(c_int)]
     _sdk_lib.geo_sdk_crs_normalize_epsg.restype = c_int
-    _sdk_lib.geo_sdk_imagery_fit_affine_tie_points_wgs84.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointAffineModel), POINTER(GeoTiePointFitStats)]
-    _sdk_lib.geo_sdk_imagery_fit_affine_tie_points_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_imagery_project_pixel_wgs84.argtypes = [POINTER(GeoTiePointAffineModel), c_double, c_double, POINTER(GeoLLH)]
-    _sdk_lib.geo_sdk_imagery_project_pixel_wgs84.restype = c_int
-    _sdk_lib.geo_sdk_imagery_solve_tie_points_wgs84.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointFitStats)]
-    _sdk_lib.geo_sdk_imagery_solve_tie_points_wgs84.restype = c_int
+    _sdk_lib.geo_sdk_imagery_fit_affine_tie_points.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointAffineModel), POINTER(GeoTiePointFitStats)]
+    _sdk_lib.geo_sdk_imagery_fit_affine_tie_points.restype = c_int
+    _sdk_lib.geo_sdk_imagery_project_pixel.argtypes = [POINTER(GeoTiePointAffineModel), c_double, c_double, POINTER(GeoLLH)]
+    _sdk_lib.geo_sdk_imagery_project_pixel.restype = c_int
+    _sdk_lib.geo_sdk_imagery_solve_tie_points.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointFitStats)]
+    _sdk_lib.geo_sdk_imagery_solve_tie_points.restype = c_int
 
 # ----------------- Declare function signatures -----------------
-# geo_status_t geo_llh_to_ecef_wgs84(const geo_llh_t* llh, geo_ecef_t* out);
-_sdk_lib.geo_sdk_llh_to_ecef_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoECEF)]
-_sdk_lib.geo_sdk_llh_to_ecef_wgs84.restype  = c_int
+# geo_status_t geo_llh_to_ecef(const geo_llh_t* llh, geo_ecef_t* out);
+_sdk_lib.geo_sdk_llh_to_ecef.argtypes = [POINTER(GeoLLH), POINTER(GeoECEF)]
+_sdk_lib.geo_sdk_llh_to_ecef.restype  = c_int
 
-# geo_status_t geo_ecef_to_llh_wgs84(const geo_ecef_t* ecef, geo_llh_t* out);
-_sdk_lib.geo_sdk_ecef_to_llh_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoLLH)]
-_sdk_lib.geo_sdk_ecef_to_llh_wgs84.restype  = c_int
+# geo_status_t geo_ecef_to_llh(const geo_ecef_t* ecef, geo_llh_t* out);
+_sdk_lib.geo_sdk_ecef_to_llh.argtypes = [POINTER(GeoECEF), POINTER(GeoLLH)]
+_sdk_lib.geo_sdk_ecef_to_llh.restype  = c_int
 
-# geo_status_t geo_ll_to_utm_wgs84(double lat_deg, double lon_deg, geo_utm_t* out);
-_sdk_lib.geo_sdk_ll_to_utm_wgs84.argtypes = [c_double, c_double, POINTER(GeoUTM)]
-_sdk_lib.geo_sdk_ll_to_utm_wgs84.restype  = c_int
+# geo_status_t geo_ll_to_utm(double lat_deg, double lon_deg, geo_utm_t* out);
+_sdk_lib.geo_sdk_ll_to_utm.argtypes = [c_double, c_double, POINTER(GeoUTM)]
+_sdk_lib.geo_sdk_ll_to_utm.restype  = c_int
 
-# geo_status_t geo_utm_to_ll_wgs84(const geo_utm_t* utm, geo_llh_t* out);
-_sdk_lib.geo_sdk_utm_to_ll_wgs84.argtypes = [POINTER(GeoUTM), POINTER(GeoLLH)]
-_sdk_lib.geo_sdk_utm_to_ll_wgs84.restype  = c_int
+# geo_status_t geo_utm_to_ll(const geo_utm_t* utm, geo_llh_t* out);
+_sdk_lib.geo_sdk_utm_to_ll.argtypes = [POINTER(GeoUTM), POINTER(GeoLLH)]
+_sdk_lib.geo_sdk_utm_to_ll.restype  = c_int
 
 # geo_status_t geo_mgrs_parse(const char* mgrs_str, geo_mgrs_t* out);
 _lib.geo_mgrs_parse.argtypes = [c_char_p, POINTER(GeoMGRS)]
@@ -300,136 +300,136 @@ _lib.geo_mgrs_to_utm.restype  = c_int
 _lib.geo_utm_to_mgrs.argtypes = [POINTER(GeoUTM), c_double, c_int, c_char_p, c_size_t]
 _lib.geo_utm_to_mgrs.restype  = c_int
 
-# geo_status_t geo_ll_to_mgrs_wgs84(double lat_deg, double lon_deg, int precision, char* out, size_t out_sz);
-_sdk_lib.geo_sdk_ll_to_mgrs_wgs84.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
-_sdk_lib.geo_sdk_ll_to_mgrs_wgs84.restype  = c_int
+# geo_status_t geo_ll_to_mgrs(double lat_deg, double lon_deg, int precision, char* out, size_t out_sz);
+_sdk_lib.geo_sdk_ll_to_mgrs.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
+_sdk_lib.geo_sdk_ll_to_mgrs.restype  = c_int
 
-# geo_status_t geo_mgrs_to_ll_wgs84(const char* mgrs_str, geo_llh_t* out);
-_sdk_lib.geo_sdk_mgrs_to_ll_wgs84.argtypes = [c_char_p, POINTER(GeoLLH)]
-_sdk_lib.geo_sdk_mgrs_to_ll_wgs84.restype  = c_int
+# geo_status_t geo_mgrs_to_ll(const char* mgrs_str, geo_llh_t* out);
+_sdk_lib.geo_sdk_mgrs_to_ll.argtypes = [c_char_p, POINTER(GeoLLH)]
+_sdk_lib.geo_sdk_mgrs_to_ll.restype  = c_int
 
-# geo_status_t geo_utm_to_ecef_wgs84(const geo_utm_t* utm, double h_m, geo_ecef_t* out);
-_sdk_lib.geo_sdk_utm_to_ecef_wgs84.argtypes = [POINTER(GeoUTM), c_double, POINTER(GeoECEF)]
-_sdk_lib.geo_sdk_utm_to_ecef_wgs84.restype  = c_int
+# geo_status_t geo_utm_to_ecef(const geo_utm_t* utm, double h_m, geo_ecef_t* out);
+_sdk_lib.geo_sdk_utm_to_ecef.argtypes = [POINTER(GeoUTM), c_double, POINTER(GeoECEF)]
+_sdk_lib.geo_sdk_utm_to_ecef.restype  = c_int
 
-# geo_status_t geo_ecef_to_utm_wgs84(const geo_ecef_t* ecef, geo_utm_t* out);
-_sdk_lib.geo_sdk_ecef_to_utm_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoUTM)]
-_sdk_lib.geo_sdk_ecef_to_utm_wgs84.restype  = c_int
+# geo_status_t geo_ecef_to_utm(const geo_ecef_t* ecef, geo_utm_t* out);
+_sdk_lib.geo_sdk_ecef_to_utm.argtypes = [POINTER(GeoECEF), POINTER(GeoUTM)]
+_sdk_lib.geo_sdk_ecef_to_utm.restype  = c_int
 
-# geo_status_t geo_mgrs_to_ecef_wgs84(const char* mgrs_str, double h_m, geo_ecef_t* out);
-_sdk_lib.geo_sdk_mgrs_to_ecef_wgs84.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
-_sdk_lib.geo_sdk_mgrs_to_ecef_wgs84.restype  = c_int
+# geo_status_t geo_mgrs_to_ecef(const char* mgrs_str, double h_m, geo_ecef_t* out);
+_sdk_lib.geo_sdk_mgrs_to_ecef.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
+_sdk_lib.geo_sdk_mgrs_to_ecef.restype  = c_int
 
-# geo_status_t geo_ecef_to_mgrs_wgs84(const geo_ecef_t* ecef, int precision, char* out, size_t out_sz);
-_sdk_lib.geo_sdk_ecef_to_mgrs_wgs84.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
-_sdk_lib.geo_sdk_ecef_to_mgrs_wgs84.restype  = c_int
+# geo_status_t geo_ecef_to_mgrs(const geo_ecef_t* ecef, int precision, char* out, size_t out_sz);
+_sdk_lib.geo_sdk_ecef_to_mgrs.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
+_sdk_lib.geo_sdk_ecef_to_mgrs.restype  = c_int
 
 
 
-# geo_status_t geo_ll_to_geohash_wgs84(double lat_deg, double lon_deg, int precision, char* out, size_t out_sz);
-_sdk_lib.geo_sdk_ll_to_geohash_wgs84.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
-_sdk_lib.geo_sdk_ll_to_geohash_wgs84.restype  = c_int
+# geo_status_t geo_ll_to_geohash(double lat_deg, double lon_deg, int precision, char* out, size_t out_sz);
+_sdk_lib.geo_sdk_ll_to_geohash.argtypes = [c_double, c_double, c_int, c_char_p, c_size_t]
+_sdk_lib.geo_sdk_ll_to_geohash.restype  = c_int
 
-# geo_status_t geo_geohash_to_ll_wgs84(const char* geohash, geo_llh_t* out);
-_sdk_lib.geo_sdk_geohash_to_ll_wgs84.argtypes = [c_char_p, POINTER(GeoLLH)]
-_sdk_lib.geo_sdk_geohash_to_ll_wgs84.restype  = c_int
+# geo_status_t geo_geohash_to_ll(const char* geohash, geo_llh_t* out);
+_sdk_lib.geo_sdk_geohash_to_ll.argtypes = [c_char_p, POINTER(GeoLLH)]
+_sdk_lib.geo_sdk_geohash_to_ll.restype  = c_int
 
-# geo_status_t geo_geohash_to_ecef_wgs84(const char* geohash, double h_m, geo_ecef_t* out);
-_sdk_lib.geo_sdk_geohash_to_ecef_wgs84.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
-_sdk_lib.geo_sdk_geohash_to_ecef_wgs84.restype  = c_int
+# geo_status_t geo_geohash_to_ecef(const char* geohash, double h_m, geo_ecef_t* out);
+_sdk_lib.geo_sdk_geohash_to_ecef.argtypes = [c_char_p, c_double, POINTER(GeoECEF)]
+_sdk_lib.geo_sdk_geohash_to_ecef.restype  = c_int
 
-# geo_status_t geo_ecef_to_geohash_wgs84(const geo_ecef_t* ecef, int precision, char* out, size_t out_sz);
-_sdk_lib.geo_sdk_ecef_to_geohash_wgs84.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
-_sdk_lib.geo_sdk_ecef_to_geohash_wgs84.restype  = c_int
+# geo_status_t geo_ecef_to_geohash(const geo_ecef_t* ecef, int precision, char* out, size_t out_sz);
+_sdk_lib.geo_sdk_ecef_to_geohash.argtypes = [POINTER(GeoECEF), c_int, c_char_p, c_size_t]
+_sdk_lib.geo_sdk_ecef_to_geohash.restype  = c_int
 
 # geo_status_t geo_ecef_distance_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
 _sdk_lib.geo_sdk_ecef_distance_m.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
 _sdk_lib.geo_sdk_ecef_distance_m.restype  = c_int
 
-# geo_status_t geo_ecef_distance_surface_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
-_sdk_lib.geo_sdk_ecef_distance_surface_m_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
-_sdk_lib.geo_sdk_ecef_distance_surface_m_wgs84.restype  = c_int
+# geo_status_t geo_ecef_distance_surface_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
+_sdk_lib.geo_sdk_ecef_distance_surface_m.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
+_sdk_lib.geo_sdk_ecef_distance_surface_m.restype  = c_int
 
-# geo_status_t geo_ecef_distance_surface_with_elevation_m_wgs84(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
-_sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m_wgs84.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
-_sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m_wgs84.restype  = c_int
+# geo_status_t geo_ecef_distance_surface_with_elevation_m(const geo_ecef_t* a, const geo_ecef_t* b, double* out_m);
+_sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m.argtypes = [POINTER(GeoECEF), POINTER(GeoECEF), POINTER(c_double)]
+_sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m.restype  = c_int
 
 
 # geo point model
 _lib.geo_point_init_from_ecef.argtypes = [POINTER(GeoPoint), POINTER(GeoECEF)]
 _lib.geo_point_init_from_ecef.restype  = c_int
-_lib.geo_point_init_from_llh_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoLLH)]
-_lib.geo_point_init_from_llh_wgs84.restype  = c_int
-_lib.geo_point_init_from_utm_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoUTM), c_double]
-_lib.geo_point_init_from_utm_wgs84.restype  = c_int
-_lib.geo_point_init_from_mgrs_wgs84.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
-_lib.geo_point_init_from_mgrs_wgs84.restype  = c_int
-_lib.geo_point_init_from_geohash_wgs84.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
-_lib.geo_point_init_from_geohash_wgs84.restype  = c_int
+_lib.geo_point_init_from_llh.argtypes = [POINTER(GeoPoint), POINTER(GeoLLH)]
+_lib.geo_point_init_from_llh.restype  = c_int
+_lib.geo_point_init_from_utm.argtypes = [POINTER(GeoPoint), POINTER(GeoUTM), c_double]
+_lib.geo_point_init_from_utm.restype  = c_int
+_lib.geo_point_init_from_mgrs.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
+_lib.geo_point_init_from_mgrs.restype  = c_int
+_lib.geo_point_init_from_geohash.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
+_lib.geo_point_init_from_geohash.restype  = c_int
 
 _lib.geo_point_set_ecef.argtypes = [POINTER(GeoPoint), POINTER(GeoECEF)]
 _lib.geo_point_set_ecef.restype  = c_int
-_lib.geo_point_set_llh_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoLLH)]
-_lib.geo_point_set_llh_wgs84.restype  = c_int
-_lib.geo_point_set_utm_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoUTM), c_double]
-_lib.geo_point_set_utm_wgs84.restype  = c_int
-_lib.geo_point_set_mgrs_wgs84.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
-_lib.geo_point_set_mgrs_wgs84.restype  = c_int
-_lib.geo_point_set_geohash_wgs84.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
-_lib.geo_point_set_geohash_wgs84.restype  = c_int
+_lib.geo_point_set_llh.argtypes = [POINTER(GeoPoint), POINTER(GeoLLH)]
+_lib.geo_point_set_llh.restype  = c_int
+_lib.geo_point_set_utm.argtypes = [POINTER(GeoPoint), POINTER(GeoUTM), c_double]
+_lib.geo_point_set_utm.restype  = c_int
+_lib.geo_point_set_mgrs.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
+_lib.geo_point_set_mgrs.restype  = c_int
+_lib.geo_point_set_geohash.argtypes = [POINTER(GeoPoint), c_char_p, c_double]
+_lib.geo_point_set_geohash.restype  = c_int
 
 _lib.geo_point_get_ecef.argtypes = [POINTER(GeoPoint), POINTER(GeoECEF)]
 _lib.geo_point_get_ecef.restype  = c_int
-_lib.geo_point_get_llh_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoLLH)]
-_lib.geo_point_get_llh_wgs84.restype  = c_int
-_lib.geo_point_get_utm_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoUTM)]
-_lib.geo_point_get_utm_wgs84.restype  = c_int
-_lib.geo_point_get_mgrs_wgs84.argtypes = [POINTER(GeoPoint), c_int, c_char_p, c_size_t]
-_lib.geo_point_get_mgrs_wgs84.restype  = c_int
-_lib.geo_point_get_geohash_wgs84.argtypes = [POINTER(GeoPoint), c_int, c_char_p, c_size_t]
-_lib.geo_point_get_geohash_wgs84.restype  = c_int
+_lib.geo_point_get_llh.argtypes = [POINTER(GeoPoint), POINTER(GeoLLH)]
+_lib.geo_point_get_llh.restype  = c_int
+_lib.geo_point_get_utm.argtypes = [POINTER(GeoPoint), POINTER(GeoUTM)]
+_lib.geo_point_get_utm.restype  = c_int
+_lib.geo_point_get_mgrs.argtypes = [POINTER(GeoPoint), c_int, c_char_p, c_size_t]
+_lib.geo_point_get_mgrs.restype  = c_int
+_lib.geo_point_get_geohash.argtypes = [POINTER(GeoPoint), c_int, c_char_p, c_size_t]
+_lib.geo_point_get_geohash.restype  = c_int
 
 _lib.geo_point_distance_straight_m.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), POINTER(c_double)]
 _lib.geo_point_distance_straight_m.restype  = c_int
-_lib.geo_point_distance_surface_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), POINTER(c_double)]
-_lib.geo_point_distance_surface_m_wgs84.restype  = c_int
-_lib.geo_point_distance_surface_with_elevation_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), POINTER(c_double)]
-_lib.geo_point_distance_surface_with_elevation_m_wgs84.restype  = c_int
+_lib.geo_point_distance_surface_m.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), POINTER(c_double)]
+_lib.geo_point_distance_surface_m.restype  = c_int
+_lib.geo_point_distance_surface_with_elevation_m.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), POINTER(c_double)]
+_lib.geo_point_distance_surface_with_elevation_m.restype  = c_int
 
 _lib.geo_points_distance_straight_m.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), c_size_t, POINTER(c_double)]
 _lib.geo_points_distance_straight_m.restype  = c_int
-_lib.geo_points_distance_surface_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), c_size_t, POINTER(c_double)]
-_lib.geo_points_distance_surface_m_wgs84.restype  = c_int
-_lib.geo_points_distance_surface_with_elevation_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), c_size_t, POINTER(c_double)]
-_lib.geo_points_distance_surface_with_elevation_m_wgs84.restype  = c_int
+_lib.geo_points_distance_surface_m.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), c_size_t, POINTER(c_double)]
+_lib.geo_points_distance_surface_m.restype  = c_int
+_lib.geo_points_distance_surface_with_elevation_m.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), c_size_t, POINTER(c_double)]
+_lib.geo_points_distance_surface_with_elevation_m.restype  = c_int
 
-_lib.geo_bulk_points_init_from_llh_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(c_uint64), POINTER(GeoLLH), c_size_t]
-_lib.geo_bulk_points_init_from_llh_wgs84.restype = c_int
+_lib.geo_bulk_points_init_from_llh.argtypes = [POINTER(GeoBulkPoints), POINTER(c_uint64), POINTER(GeoLLH), c_size_t]
+_lib.geo_bulk_points_init_from_llh.restype = c_int
 _lib.geo_bulk_points_init_from_ecef.argtypes = [POINTER(GeoBulkPoints), POINTER(c_uint64), POINTER(GeoECEF), c_size_t]
 _lib.geo_bulk_points_init_from_ecef.restype = c_int
 _lib.geo_bulk_points_free.argtypes = [POINTER(GeoBulkPoints)]
 _lib.geo_bulk_points_free.restype = c_int
-_lib.geo_bulk_points_to_llh_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_size_t]
-_lib.geo_bulk_points_to_llh_wgs84.restype = c_int
+_lib.geo_bulk_points_to_llh.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_size_t]
+_lib.geo_bulk_points_to_llh.restype = c_int
 _lib.geo_bulk_points_to_ecef.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoECEF), c_size_t]
 _lib.geo_bulk_points_to_ecef.restype = c_int
-_lib.geo_bulk_points_filter_proximity_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_double, c_int, c_size_t, POINTER(c_uint64), c_size_t, POINTER(c_size_t)]
-_lib.geo_bulk_points_filter_proximity_wgs84.restype = c_int
-_lib.geo_bulk_points_filter_polygon_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, c_double, c_int, c_size_t, POINTER(c_uint64), c_size_t, POINTER(c_size_t)]
-_lib.geo_bulk_points_filter_polygon_wgs84.restype = c_int
-_lib.geo_filter_polygons_by_polygon_wgs84.argtypes = [POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), c_size_t, c_double, c_int, c_int, c_size_t, POINTER(c_size_t), c_size_t, POINTER(c_size_t)]
-_lib.geo_filter_polygons_by_polygon_wgs84.restype = c_int
+_lib.geo_bulk_points_filter_proximity.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_double, c_int, c_size_t, POINTER(c_uint64), c_size_t, POINTER(c_size_t)]
+_lib.geo_bulk_points_filter_proximity.restype = c_int
+_lib.geo_bulk_points_filter_polygon.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, c_double, c_int, c_size_t, POINTER(c_uint64), c_size_t, POINTER(c_size_t)]
+_lib.geo_bulk_points_filter_polygon.restype = c_int
+_lib.geo_filter_polygons_by_polygon.argtypes = [POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), c_size_t, c_double, c_int, c_int, c_size_t, POINTER(c_size_t), c_size_t, POINTER(c_size_t)]
+_lib.geo_filter_polygons_by_polygon.restype = c_int
 
 
 # geodesy + CRS
-_sdk_lib.geo_sdk_llh_geodesic_inverse_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), POINTER(GeoGeodesicInverseResult)]
-_sdk_lib.geo_sdk_llh_geodesic_inverse_wgs84.restype  = c_int
+_sdk_lib.geo_sdk_llh_geodesic_inverse.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), POINTER(GeoGeodesicInverseResult)]
+_sdk_lib.geo_sdk_llh_geodesic_inverse.restype  = c_int
 
-_sdk_lib.geo_sdk_llh_geodesic_direct_wgs84.argtypes = [POINTER(GeoLLH), c_double, c_double, POINTER(GeoLLH)]
-_sdk_lib.geo_sdk_llh_geodesic_direct_wgs84.restype  = c_int
+_sdk_lib.geo_sdk_llh_geodesic_direct.argtypes = [POINTER(GeoLLH), c_double, c_double, POINTER(GeoLLH)]
+_sdk_lib.geo_sdk_llh_geodesic_direct.restype  = c_int
 
-_sdk_lib.geo_sdk_llh_geodesic_interpolate_wgs84.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), c_double, POINTER(GeoLLH)]
-_sdk_lib.geo_sdk_llh_geodesic_interpolate_wgs84.restype  = c_int
+_sdk_lib.geo_sdk_llh_geodesic_interpolate.argtypes = [POINTER(GeoLLH), POINTER(GeoLLH), c_double, POINTER(GeoLLH)]
+_sdk_lib.geo_sdk_llh_geodesic_interpolate.restype  = c_int
 
 _sdk_lib.geo_sdk_crs_from_epsg.argtypes = [c_int, POINTER(GeoCRS)]
 _sdk_lib.geo_sdk_crs_from_epsg.restype  = c_int
@@ -439,34 +439,34 @@ _sdk_lib.geo_sdk_crs_normalize_epsg.restype  = c_int
 
 
 # imagery tie-point geopositioning
-_sdk_lib.geo_sdk_imagery_fit_affine_tie_points_wgs84.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointAffineModel), POINTER(GeoTiePointFitStats)]
-_sdk_lib.geo_sdk_imagery_fit_affine_tie_points_wgs84.restype  = c_int
+_sdk_lib.geo_sdk_imagery_fit_affine_tie_points.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointAffineModel), POINTER(GeoTiePointFitStats)]
+_sdk_lib.geo_sdk_imagery_fit_affine_tie_points.restype  = c_int
 
-_sdk_lib.geo_sdk_imagery_project_pixel_wgs84.argtypes = [POINTER(GeoTiePointAffineModel), c_double, c_double, POINTER(GeoLLH)]
-_sdk_lib.geo_sdk_imagery_project_pixel_wgs84.restype  = c_int
+_sdk_lib.geo_sdk_imagery_project_pixel.argtypes = [POINTER(GeoTiePointAffineModel), c_double, c_double, POINTER(GeoLLH)]
+_sdk_lib.geo_sdk_imagery_project_pixel.restype  = c_int
 
-_sdk_lib.geo_sdk_imagery_solve_tie_points_wgs84.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointFitStats)]
-_sdk_lib.geo_sdk_imagery_solve_tie_points_wgs84.restype  = c_int
+_sdk_lib.geo_sdk_imagery_solve_tie_points.argtypes = [POINTER(GeoTiePoint), c_size_t, POINTER(GeoTiePointFitStats)]
+_sdk_lib.geo_sdk_imagery_solve_tie_points.restype  = c_int
 
 # ----------------- Pythonic wrappers -----------------
 def llh_to_ecef(lat_deg: float, lon_deg: float, h_m: float = 0.0) -> tuple[float, float, float]:
     llh = GeoLLH(lat_deg, lon_deg, h_m)
     out = GeoECEF()
-    _check(_sdk_lib.geo_sdk_llh_to_ecef_wgs84(ctypes.byref(llh), ctypes.byref(out)),
-           "geo_llh_to_ecef_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_llh_to_ecef(ctypes.byref(llh), ctypes.byref(out)),
+           "geo_llh_to_ecef failed")
     return (out.x, out.y, out.z)
 
 def ecef_to_llh(x: float, y: float, z: float) -> tuple[float, float, float]:
     ecef = GeoECEF(x, y, z)
     out = GeoLLH()
-    _check(_sdk_lib.geo_sdk_ecef_to_llh_wgs84(ctypes.byref(ecef), ctypes.byref(out)),
-           "geo_ecef_to_llh_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_ecef_to_llh(ctypes.byref(ecef), ctypes.byref(out)),
+           "geo_ecef_to_llh failed")
     return (out.lat_deg, out.lon_deg, out.h_m)
 
 def ll_to_utm(lat_deg: float, lon_deg: float) -> dict:
     out = GeoUTM()
-    _check(_sdk_lib.geo_sdk_ll_to_utm_wgs84(lat_deg, lon_deg, ctypes.byref(out)),
-           "geo_ll_to_utm_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_ll_to_utm(lat_deg, lon_deg, ctypes.byref(out)),
+           "geo_ll_to_utm failed")
     return {
         "zone": int(out.zone),
         "hemi": out.hemi.decode("ascii"),
@@ -477,22 +477,22 @@ def ll_to_utm(lat_deg: float, lon_deg: float) -> dict:
 def utm_to_ll(zone: int, hemi: str, easting: float, northing: float) -> tuple[float, float]:
     u = GeoUTM(int(zone), hemi.encode("ascii"), float(easting), float(northing))
     out = GeoLLH()
-    _check(_sdk_lib.geo_sdk_utm_to_ll_wgs84(ctypes.byref(u), ctypes.byref(out)),
-           "geo_utm_to_ll_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_utm_to_ll(ctypes.byref(u), ctypes.byref(out)),
+           "geo_utm_to_ll failed")
     return (out.lat_deg, out.lon_deg)
 
 def utm_to_ecef(zone: int, hemi: str, easting: float, northing: float, h_m: float = 0.0) -> tuple[float, float, float]:
     u = GeoUTM(int(zone), hemi.encode("ascii"), float(easting), float(northing))
     out = GeoECEF()
-    _check(_sdk_lib.geo_sdk_utm_to_ecef_wgs84(ctypes.byref(u), float(h_m), ctypes.byref(out)),
-           "geo_utm_to_ecef_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_utm_to_ecef(ctypes.byref(u), float(h_m), ctypes.byref(out)),
+           "geo_utm_to_ecef failed")
     return (out.x, out.y, out.z)
 
 def ecef_to_utm(x: float, y: float, z: float) -> dict:
     e = GeoECEF(float(x), float(y), float(z))
     out = GeoUTM()
-    _check(_sdk_lib.geo_sdk_ecef_to_utm_wgs84(ctypes.byref(e), ctypes.byref(out)),
-           "geo_ecef_to_utm_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_ecef_to_utm(ctypes.byref(e), ctypes.byref(out)),
+           "geo_ecef_to_utm failed")
     return {
         "zone": int(out.zone),
         "hemi": out.hemi.decode("ascii"),
@@ -516,51 +516,51 @@ def _call_with_growing_buffer(call, initial_size: int = 64, max_size: int = 4096
 
 def ll_to_mgrs(lat_deg: float, lon_deg: float, precision: int = 5, buf_sz: int = 64) -> str:
     return _call_with_growing_buffer(
-        lambda buf, sz: _sdk_lib.geo_sdk_ll_to_mgrs_wgs84(lat_deg, lon_deg, int(precision), buf, sz),
+        lambda buf, sz: _sdk_lib.geo_sdk_ll_to_mgrs(lat_deg, lon_deg, int(precision), buf, sz),
         initial_size=buf_sz,
     )
 
 def mgrs_to_ll(mgrs: str) -> tuple[float, float]:
     out = GeoLLH()
-    status = _sdk_lib.geo_sdk_mgrs_to_ll_wgs84(mgrs.encode("ascii"), ctypes.byref(out))
-    _check(status, "geo_mgrs_to_ll_wgs84 failed")
+    status = _sdk_lib.geo_sdk_mgrs_to_ll(mgrs.encode("ascii"), ctypes.byref(out))
+    _check(status, "geo_mgrs_to_ll failed")
     return (out.lat_deg, out.lon_deg)
 
 def mgrs_to_ecef(mgrs: str, h_m: float = 0.0) -> tuple[float, float, float]:
     out = GeoECEF()
-    status = _sdk_lib.geo_sdk_mgrs_to_ecef_wgs84(mgrs.encode("ascii"), float(h_m), ctypes.byref(out))
-    _check(status, "geo_mgrs_to_ecef_wgs84 failed")
+    status = _sdk_lib.geo_sdk_mgrs_to_ecef(mgrs.encode("ascii"), float(h_m), ctypes.byref(out))
+    _check(status, "geo_mgrs_to_ecef failed")
     return (out.x, out.y, out.z)
 
 def ecef_to_mgrs(x: float, y: float, z: float, precision: int = 5, buf_sz: int = 64) -> str:
     e = GeoECEF(float(x), float(y), float(z))
     return _call_with_growing_buffer(
-        lambda buf, sz: _sdk_lib.geo_sdk_ecef_to_mgrs_wgs84(ctypes.byref(e), int(precision), buf, sz),
+        lambda buf, sz: _sdk_lib.geo_sdk_ecef_to_mgrs(ctypes.byref(e), int(precision), buf, sz),
         initial_size=buf_sz,
     )
 
 def ll_to_geohash(lat_deg: float, lon_deg: float, precision: int = 12, buf_sz: int = 32) -> str:
     return _call_with_growing_buffer(
-        lambda buf, sz: _sdk_lib.geo_sdk_ll_to_geohash_wgs84(lat_deg, lon_deg, int(precision), buf, sz),
+        lambda buf, sz: _sdk_lib.geo_sdk_ll_to_geohash(lat_deg, lon_deg, int(precision), buf, sz),
         initial_size=buf_sz,
     )
 
 def geohash_to_ll(geohash: str) -> tuple[float, float]:
     out = GeoLLH()
-    status = _sdk_lib.geo_sdk_geohash_to_ll_wgs84(geohash.encode("ascii"), ctypes.byref(out))
-    _check(status, "geo_geohash_to_ll_wgs84 failed")
+    status = _sdk_lib.geo_sdk_geohash_to_ll(geohash.encode("ascii"), ctypes.byref(out))
+    _check(status, "geo_geohash_to_ll failed")
     return (float(out.lat_deg), float(out.lon_deg))
 
 def geohash_to_ecef(geohash: str, h_m: float = 0.0) -> tuple[float, float, float]:
     out = GeoECEF()
-    status = _sdk_lib.geo_sdk_geohash_to_ecef_wgs84(geohash.encode("ascii"), float(h_m), ctypes.byref(out))
-    _check(status, "geo_geohash_to_ecef_wgs84 failed")
+    status = _sdk_lib.geo_sdk_geohash_to_ecef(geohash.encode("ascii"), float(h_m), ctypes.byref(out))
+    _check(status, "geo_geohash_to_ecef failed")
     return (float(out.x), float(out.y), float(out.z))
 
 def ecef_to_geohash(x: float, y: float, z: float, precision: int = 12, buf_sz: int = 32) -> str:
     e = GeoECEF(float(x), float(y), float(z))
     return _call_with_growing_buffer(
-        lambda buf, sz: _sdk_lib.geo_sdk_ecef_to_geohash_wgs84(ctypes.byref(e), int(precision), buf, sz),
+        lambda buf, sz: _sdk_lib.geo_sdk_ecef_to_geohash(ctypes.byref(e), int(precision), buf, sz),
         initial_size=buf_sz,
     )
 
@@ -603,8 +603,8 @@ def ecef_surface_distance(x1: float, y1: float, z1: float, x2: float, y2: float,
     a = GeoECEF(float(x1), float(y1), float(z1))
     b = GeoECEF(float(x2), float(y2), float(z2))
     out = c_double()
-    _check(_sdk_lib.geo_sdk_ecef_distance_surface_m_wgs84(ctypes.byref(a), ctypes.byref(b), ctypes.byref(out)),
-           "geo_ecef_distance_surface_m_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_ecef_distance_surface_m(ctypes.byref(a), ctypes.byref(b), ctypes.byref(out)),
+           "geo_ecef_distance_surface_m failed")
     return float(out.value)
 
 
@@ -613,8 +613,8 @@ def ecef_surface_distance_with_elevation(x1: float, y1: float, z1: float,
     a = GeoECEF(float(x1), float(y1), float(z1))
     b = GeoECEF(float(x2), float(y2), float(z2))
     out = c_double()
-    _check(_sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m_wgs84(ctypes.byref(a), ctypes.byref(b), ctypes.byref(out)),
-           "geo_ecef_distance_surface_with_elevation_m_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_ecef_distance_surface_with_elevation_m(ctypes.byref(a), ctypes.byref(b), ctypes.byref(out)),
+           "geo_ecef_distance_surface_with_elevation_m failed")
     return float(out.value)
 
 
@@ -690,18 +690,18 @@ class Point:
                    "geo_point_init_from_ecef failed")
         elif utm is not None:
             u = GeoUTM(int(utm["zone"]), str(utm["hemi"]).encode("ascii"), float(utm["easting"]), float(utm["northing"]))
-            _check(_lib.geo_point_init_from_utm_wgs84(ctypes.byref(self._point), ctypes.byref(u), float(h_m)),
-                   "geo_point_init_from_utm_wgs84 failed")
+            _check(_lib.geo_point_init_from_utm(ctypes.byref(self._point), ctypes.byref(u), float(h_m)),
+                   "geo_point_init_from_utm failed")
         elif mgrs is not None:
-            _check(_lib.geo_point_init_from_mgrs_wgs84(ctypes.byref(self._point), mgrs.encode("ascii"), float(h_m)),
-                   "geo_point_init_from_mgrs_wgs84 failed")
+            _check(_lib.geo_point_init_from_mgrs(ctypes.byref(self._point), mgrs.encode("ascii"), float(h_m)),
+                   "geo_point_init_from_mgrs failed")
         elif geohash is not None:
-            _check(_lib.geo_point_init_from_geohash_wgs84(ctypes.byref(self._point), geohash.encode("ascii"), float(h_m)),
-                   "geo_point_init_from_geohash_wgs84 failed")
+            _check(_lib.geo_point_init_from_geohash(ctypes.byref(self._point), geohash.encode("ascii"), float(h_m)),
+                   "geo_point_init_from_geohash failed")
         elif lat_deg is not None and lon_deg is not None:
             llh = GeoLLH(float(lat_deg), float(lon_deg), float(h_m))
-            _check(_lib.geo_point_init_from_llh_wgs84(ctypes.byref(self._point), ctypes.byref(llh)),
-                   "geo_point_init_from_llh_wgs84 failed")
+            _check(_lib.geo_point_init_from_llh(ctypes.byref(self._point), ctypes.byref(llh)),
+                   "geo_point_init_from_llh failed")
         else:
             raise ValueError("Point requires LL, UTM, MGRS, geohash, or ECEF input")
 
@@ -738,7 +738,7 @@ class Point:
         if self._use_sdk:
             _check(_sdk_lib.geo_sdk_point_get_llh(self._sdk_handle, ctypes.byref(out)), "geo_sdk_point_get_llh failed")
         else:
-            _check(_lib.geo_point_get_llh_wgs84(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_llh_wgs84 failed")
+            _check(_lib.geo_point_get_llh(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_llh failed")
         return (float(out.lat_deg), float(out.lon_deg), float(out.h_m))
 
     @llh.setter
@@ -749,7 +749,7 @@ class Point:
                    "geo_sdk_point_set_llh failed")
         else:
             llh = GeoLLH(float(value[0]), float(value[1]), h_m)
-            _check(_lib.geo_point_set_llh_wgs84(ctypes.byref(self._point), ctypes.byref(llh)), "geo_point_set_llh_wgs84 failed")
+            _check(_lib.geo_point_set_llh(ctypes.byref(self._point), ctypes.byref(llh)), "geo_point_set_llh failed")
 
     @property
     def utm(self) -> dict:
@@ -757,7 +757,7 @@ class Point:
         if self._use_sdk:
             _check(_sdk_lib.geo_sdk_point_get_utm(self._sdk_handle, ctypes.byref(out)), "geo_sdk_point_get_utm failed")
         else:
-            _check(_lib.geo_point_get_utm_wgs84(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_utm_wgs84 failed")
+            _check(_lib.geo_point_get_utm(ctypes.byref(self._point), ctypes.byref(out)), "geo_point_get_utm failed")
         return {"zone": int(out.zone), "hemi": out.hemi.decode("ascii"), "easting": float(out.easting), "northing": float(out.northing)}
 
     @utm.setter
@@ -768,7 +768,7 @@ class Point:
                    float(value["easting"]), float(value["northing"]), h_m), "geo_sdk_point_set_utm failed")
         else:
             u = GeoUTM(int(value["zone"]), str(value["hemi"]).encode("ascii"), float(value["easting"]), float(value["northing"]))
-            _check(_lib.geo_point_set_utm_wgs84(ctypes.byref(self._point), ctypes.byref(u), h_m), "geo_point_set_utm_wgs84 failed")
+            _check(_lib.geo_point_set_utm(ctypes.byref(self._point), ctypes.byref(u), h_m), "geo_point_set_utm failed")
 
     def get_mgrs(self, precision: int = 5) -> str:
         buf = ctypes.create_string_buffer(64)
@@ -776,8 +776,8 @@ class Point:
             _check(_sdk_lib.geo_sdk_point_get_mgrs(self._sdk_handle, int(precision), buf, ctypes.sizeof(buf)),
                    "geo_sdk_point_get_mgrs failed")
         else:
-            _check(_lib.geo_point_get_mgrs_wgs84(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
-                   "geo_point_get_mgrs_wgs84 failed")
+            _check(_lib.geo_point_get_mgrs(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
+                   "geo_point_get_mgrs failed")
         return buf.value.decode("ascii")
 
     def set_mgrs(self, mgrs: str, h_m: float = 0.0) -> None:
@@ -785,8 +785,8 @@ class Point:
             _check(_sdk_lib.geo_sdk_point_set_mgrs(self._sdk_handle, mgrs.encode("ascii"), float(h_m)),
                    "geo_sdk_point_set_mgrs failed")
         else:
-            _check(_lib.geo_point_set_mgrs_wgs84(ctypes.byref(self._point), mgrs.encode("ascii"), float(h_m)),
-                   "geo_point_set_mgrs_wgs84 failed")
+            _check(_lib.geo_point_set_mgrs(ctypes.byref(self._point), mgrs.encode("ascii"), float(h_m)),
+                   "geo_point_set_mgrs failed")
 
     def get_geohash(self, precision: int = 12) -> str:
         buf = ctypes.create_string_buffer(32)
@@ -794,8 +794,8 @@ class Point:
             _check(_sdk_lib.geo_sdk_point_get_geohash(self._sdk_handle, int(precision), buf, ctypes.sizeof(buf)),
                    "geo_sdk_point_get_geohash failed")
         else:
-            _check(_lib.geo_point_get_geohash_wgs84(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
-                   "geo_point_get_geohash_wgs84 failed")
+            _check(_lib.geo_point_get_geohash(ctypes.byref(self._point), int(precision), buf, ctypes.sizeof(buf)),
+                   "geo_point_get_geohash failed")
         return buf.value.decode("ascii")
 
     def set_geohash(self, geohash: str, h_m: float = 0.0) -> None:
@@ -803,8 +803,8 @@ class Point:
             _check(_sdk_lib.geo_sdk_point_set_geohash(self._sdk_handle, geohash.encode("ascii"), float(h_m)),
                    "geo_sdk_point_set_geohash failed")
         else:
-            _check(_lib.geo_point_set_geohash_wgs84(ctypes.byref(self._point), geohash.encode("ascii"), float(h_m)),
-                   "geo_point_set_geohash_wgs84 failed")
+            _check(_lib.geo_point_set_geohash(ctypes.byref(self._point), geohash.encode("ascii"), float(h_m)),
+                   "geo_point_set_geohash failed")
 
     def distance_straight(self, other: "Point") -> float:
         out = c_double()
@@ -827,11 +827,11 @@ class Point:
                        "geo_sdk_point_distance_surface_m failed")
         else:
             if include_elevation:
-                _check(_lib.geo_point_distance_surface_with_elevation_m_wgs84(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
-                       "geo_point_distance_surface_with_elevation_m_wgs84 failed")
+                _check(_lib.geo_point_distance_surface_with_elevation_m(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
+                       "geo_point_distance_surface_with_elevation_m failed")
             else:
-                _check(_lib.geo_point_distance_surface_m_wgs84(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
-                       "geo_point_distance_surface_m_wgs84 failed")
+                _check(_lib.geo_point_distance_surface_m(ctypes.byref(self._point), ctypes.byref(other._point), ctypes.byref(out)),
+                       "geo_point_distance_surface_m failed")
         return float(out.value)
 
 def _as_point_array(points: list[Point]):
@@ -859,9 +859,9 @@ def points_distance_bulk(points_a: list[Point], points_b: list[Point], *, mode: 
     if mode == "straight":
         status = _lib.geo_points_distance_straight_m(a, b, n, out)
     elif mode == "surface":
-        status = _lib.geo_points_distance_surface_m_wgs84(a, b, n, out)
+        status = _lib.geo_points_distance_surface_m(a, b, n, out)
     elif mode == "surface_with_elevation":
-        status = _lib.geo_points_distance_surface_with_elevation_m_wgs84(a, b, n, out)
+        status = _lib.geo_points_distance_surface_with_elevation_m(a, b, n, out)
     else:
         raise ValueError("mode must be one of: straight, surface, surface_with_elevation")
 
@@ -892,8 +892,8 @@ class BulkGeoPoints:
             llh_arr_t = GeoLLH * n
             ids_arr = ids_arr_t(*[int(v) for v in ids])
             llh_arr = llh_arr_t(*[GeoLLH(float(p[0]), float(p[1]), float(p[2])) for p in llh_points])
-            _check(_lib.geo_bulk_points_init_from_llh_wgs84(ctypes.byref(self._bulk), ids_arr, llh_arr, n),
-                   "geo_bulk_points_init_from_llh_wgs84 failed")
+            _check(_lib.geo_bulk_points_init_from_llh(ctypes.byref(self._bulk), ids_arr, llh_arr, n),
+                   "geo_bulk_points_init_from_llh failed")
         elif ecef_points is not None:
             n = len(ecef_points)
             if ids is None:
@@ -928,7 +928,7 @@ class BulkGeoPoints:
         n = self.count
         out_t = GeoLLH * n
         out = out_t()
-        _check(_lib.geo_bulk_points_to_llh_wgs84(ctypes.byref(self._bulk), out, n), "geo_bulk_points_to_llh_wgs84 failed")
+        _check(_lib.geo_bulk_points_to_llh(ctypes.byref(self._bulk), out, n), "geo_bulk_points_to_llh failed")
         return [(float(out[i].lat_deg), float(out[i].lon_deg), float(out[i].h_m)) for i in range(n)]
 
     def proximity_filter(self, point_of_interest, buffer_m: float,
@@ -942,9 +942,9 @@ class BulkGeoPoints:
         ids_t = c_uint64 * cap
         out_ids = ids_t()
         out_n = c_size_t()
-        _check(_lib.geo_bulk_points_filter_proximity_wgs84(ctypes.byref(self._bulk), ctypes.byref(poi), float(buffer_m),
+        _check(_lib.geo_bulk_points_filter_proximity(ctypes.byref(self._bulk), ctypes.byref(poi), float(buffer_m),
                1 if include_within else 0, int(thread_count), out_ids, cap, ctypes.byref(out_n)),
-               "geo_bulk_points_filter_proximity_wgs84 failed")
+               "geo_bulk_points_filter_proximity failed")
         return [int(out_ids[i]) for i in range(out_n.value)]
 
     def polygon_filter(self, polygon: "GeoPolygon", *, buffer_m: float = 0.0,
@@ -955,10 +955,10 @@ class BulkGeoPoints:
         ids_t = c_uint64 * cap
         out_ids = ids_t()
         out_n = c_size_t()
-        _check(_lib.geo_bulk_points_filter_polygon_wgs84(ctypes.byref(self._bulk), o_arr, len(polygon.outer),
+        _check(_lib.geo_bulk_points_filter_polygon(ctypes.byref(self._bulk), o_arr, len(polygon.outer),
                h_arr, off_arr, cnt_arr, hn, float(buffer_m), 1 if include_inside else 0,
                int(thread_count), out_ids, cap, ctypes.byref(out_n)),
-               "geo_bulk_points_filter_polygon_wgs84 failed")
+               "geo_bulk_points_filter_polygon failed")
         return [int(out_ids[i]) for i in range(out_n.value)]
 
 
@@ -983,46 +983,46 @@ def filter_polygons_by_polygon(polygons: list["GeoPolygon"], polygon_of_interest
     out = out_t()
     out_n = c_size_t()
     poi_outer = _ring_to_arr(polygon_of_interest.outer)
-    _check(_lib.geo_filter_polygons_by_polygon_wgs84(pts, off_t(*offsets), cnt_t(*counts), len(polygons),
+    _check(_lib.geo_filter_polygons_by_polygon(pts, off_t(*offsets), cnt_t(*counts), len(polygons),
            poi_outer, len(polygon_of_interest.outer), float(interest_buffer_m),
            1 if require_full_containment else 0, 1 if include_inside else 0,
            int(thread_count), out, len(polygons), ctypes.byref(out_n)),
-           "geo_filter_polygons_by_polygon_wgs84 failed")
+           "geo_filter_polygons_by_polygon failed")
     return [polygons[int(out[i])] for i in range(out_n.value)]
 
 
 
 # polyline C APIs
-_lib.geo_polyline_length_m_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
-_lib.geo_polyline_length_m_wgs84.restype = c_int
-_lib.geo_polyline_distance_to_point_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(c_double)]
-_lib.geo_polyline_distance_to_point_wgs84.restype = c_int
-_lib.geo_polyline_position_at_distance_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, POINTER(GeoLLH)]
-_lib.geo_polyline_position_at_distance_wgs84.restype = c_int
+_lib.geo_polyline_length_m.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
+_lib.geo_polyline_length_m.restype = c_int
+_lib.geo_polyline_distance_to_point.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(c_double)]
+_lib.geo_polyline_distance_to_point.restype = c_int
+_lib.geo_polyline_position_at_distance.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, POINTER(GeoLLH)]
+_lib.geo_polyline_position_at_distance.restype = c_int
 
 
 
 # polygon C APIs
-_lib.geo_polygon_area_m2_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(c_double)]
-_lib.geo_polygon_area_m2_wgs84.restype = c_int
-_lib.geo_polygon_contains_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), POINTER(c_int)]
-_lib.geo_polygon_contains_wgs84.restype = c_int
-_lib.geo_polygon_distance_to_point_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(GeoLLH), POINTER(c_int), POINTER(c_double)]
-_lib.geo_polygon_distance_to_point_wgs84.restype = c_int
-_lib.geo_polygon_perimeter_m_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
-_lib.geo_polygon_perimeter_m_wgs84.restype = c_int
-_lib.geo_polygon_position_at_distance_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, c_int, POINTER(GeoLLH)]
-_lib.geo_polygon_position_at_distance_wgs84.restype = c_int
-_lib.geo_multipolygon_area_m2_wgs84.argtypes = [POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(c_double)]
-_lib.geo_multipolygon_area_m2_wgs84.restype = c_int
-_lib.geo_polygon_intersection_convex_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
-_lib.geo_polygon_intersection_convex_wgs84.restype = c_int
-_lib.geo_polygon_union_convex_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
-_lib.geo_polygon_union_convex_wgs84.restype = c_int
-_lib.geo_polygon_difference_convex_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
-_lib.geo_polygon_difference_convex_wgs84.restype = c_int
-_lib.geo_polygon_xor_convex_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
-_lib.geo_polygon_xor_convex_wgs84.restype = c_int
+_lib.geo_polygon_area_m2.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(c_double)]
+_lib.geo_polygon_area_m2.restype = c_int
+_lib.geo_polygon_contains.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), POINTER(c_int)]
+_lib.geo_polygon_contains.restype = c_int
+_lib.geo_polygon_distance_to_point.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(GeoLLH), POINTER(c_int), POINTER(c_double)]
+_lib.geo_polygon_distance_to_point.restype = c_int
+_lib.geo_polygon_perimeter_m.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
+_lib.geo_polygon_perimeter_m.restype = c_int
+_lib.geo_polygon_position_at_distance.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, c_int, POINTER(GeoLLH)]
+_lib.geo_polygon_position_at_distance.restype = c_int
+_lib.geo_multipolygon_area_m2.argtypes = [POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(c_double)]
+_lib.geo_multipolygon_area_m2.restype = c_int
+_lib.geo_polygon_intersection_convex.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
+_lib.geo_polygon_intersection_convex.restype = c_int
+_lib.geo_polygon_union_convex.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
+_lib.geo_polygon_union_convex.restype = c_int
+_lib.geo_polygon_difference_convex.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
+_lib.geo_polygon_difference_convex.restype = c_int
+_lib.geo_polygon_xor_convex.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
+_lib.geo_polygon_xor_convex.restype = c_int
 
 @dataclass(frozen=True)
 class GeoPointData:
@@ -1076,7 +1076,7 @@ class GeoPolyline:
         if self._length_cache_m is None:
             out = c_double()
             arr = self._arr()
-            _check(_lib.geo_polyline_length_m_wgs84(arr, len(self._points), ctypes.byref(out)), 'geo_polyline_length_m_wgs84 failed')
+            _check(_lib.geo_polyline_length_m(arr, len(self._points), ctypes.byref(out)), 'geo_polyline_length_m failed')
             self._length_cache_m = float(out.value)
         return self._length_cache_m
 
@@ -1086,9 +1086,9 @@ class GeoPolyline:
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
         near = GeoLLH()
         out = c_double()
-        _check(_lib.geo_polyline_distance_to_point_wgs84(arr, len(self._points), ctypes.byref(gp),
+        _check(_lib.geo_polyline_distance_to_point(arr, len(self._points), ctypes.byref(gp),
                1 if return_nearest_point else 0, ctypes.byref(near), ctypes.byref(out)),
-               'geo_polyline_distance_to_point_wgs84 failed')
+               'geo_polyline_distance_to_point failed')
         d = {'distance_m': float(out.value)}
         if return_nearest_point:
             d['nearest_point'] = GeoPointData(near.lat_deg, near.lon_deg, near.h_m)
@@ -1097,9 +1097,9 @@ class GeoPolyline:
     def position_at_distance(self, distance_m, *, from_end=False):
         arr = self._arr()
         out = GeoLLH()
-        _check(_lib.geo_polyline_position_at_distance_wgs84(arr, len(self._points), float(distance_m),
+        _check(_lib.geo_polyline_position_at_distance(arr, len(self._points), float(distance_m),
                1 if from_end else 0, ctypes.byref(out)),
-               'geo_polyline_position_at_distance_wgs84 failed')
+               'geo_polyline_position_at_distance failed')
         return GeoPointData(out.lat_deg, out.lon_deg, out.h_m)
 
 
@@ -1148,7 +1148,7 @@ class GeoPolygon:
         o_arr = _ring_to_arr(self._outer)
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         out = c_double()
-        _check(_lib.geo_polygon_area_m2_wgs84(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(out)), 'geo_polygon_area_m2_wgs84 failed')
+        _check(_lib.geo_polygon_area_m2(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(out)), 'geo_polygon_area_m2 failed')
         return float(out.value)
 
     @property
@@ -1156,16 +1156,16 @@ class GeoPolygon:
         if self._perimeter_cache_m is None:
             o_arr = _ring_to_arr(self._outer)
             out = c_double()
-            _check(_lib.geo_polygon_perimeter_m_wgs84(o_arr, len(self._outer), ctypes.byref(out)), 'geo_polygon_perimeter_m_wgs84 failed')
+            _check(_lib.geo_polygon_perimeter_m(o_arr, len(self._outer), ctypes.byref(out)), 'geo_polygon_perimeter_m failed')
             self._perimeter_cache_m = float(out.value)
         return self._perimeter_cache_m
 
     def position_at_distance(self, distance_m, *, from_end=False, cyclic=True):
         o_arr = _ring_to_arr(self._outer)
         out = GeoLLH()
-        _check(_lib.geo_polygon_position_at_distance_wgs84(o_arr, len(self._outer), float(distance_m),
+        _check(_lib.geo_polygon_position_at_distance(o_arr, len(self._outer), float(distance_m),
                1 if from_end else 0, 1 if cyclic else 0, ctypes.byref(out)),
-               'geo_polygon_position_at_distance_wgs84 failed')
+               'geo_polygon_position_at_distance failed')
         return GeoPointData(out.lat_deg, out.lon_deg, out.h_m)
 
     def contains(self, point):
@@ -1174,7 +1174,7 @@ class GeoPolygon:
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         inside = c_int()
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
-        _check(_lib.geo_polygon_contains_wgs84(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(gp), ctypes.byref(inside)), 'geo_polygon_contains_wgs84 failed')
+        _check(_lib.geo_polygon_contains(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(gp), ctypes.byref(inside)), 'geo_polygon_contains failed')
         return bool(inside.value)
 
     def distance_to_point(self, point, *, return_nearest_edge_point=False, return_nearest_vertices=False):
@@ -1183,10 +1183,10 @@ class GeoPolygon:
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
         edge = GeoLLH(); v1 = GeoLLH(); v2 = GeoLLH(); inside = c_int(); d = c_double()
-        _check(_lib.geo_polygon_distance_to_point_wgs84(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn,
+        _check(_lib.geo_polygon_distance_to_point(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn,
                ctypes.byref(gp), 1 if return_nearest_edge_point else 0, ctypes.byref(edge),
                1 if return_nearest_vertices else 0, ctypes.byref(v1), ctypes.byref(v2), ctypes.byref(inside), ctypes.byref(d)),
-               'geo_polygon_distance_to_point_wgs84 failed')
+               'geo_polygon_distance_to_point failed')
         out={'inside': bool(inside.value), 'distance_to_edge_m': float(d.value)}
         if return_nearest_edge_point:
             out['nearest_edge_point'] = GeoPointData(edge.lat_deg, edge.lon_deg, edge.h_m)
@@ -1210,7 +1210,7 @@ class GeoMultiPolygon:
         off_t = c_size_t * len(offsets)
         cnt_t = c_size_t * len(counts)
         out = c_double()
-        _check(_lib.geo_multipolygon_area_m2_wgs84(pts, off_t(*offsets), cnt_t(*counts), len(self.polygons), ctypes.byref(out)), 'geo_multipolygon_area_m2_wgs84 failed')
+        _check(_lib.geo_multipolygon_area_m2(pts, off_t(*offsets), cnt_t(*counts), len(self.polygons), ctypes.byref(out)), 'geo_multipolygon_area_m2 failed')
         return float(out.value)
 
     def contains(self, point):
@@ -1239,16 +1239,16 @@ def _convex_bool(op_name, a, b):
 
 
 def polygon_union(a, b):
-    return _convex_bool('geo_polygon_union_convex_wgs84', a, b)
+    return _convex_bool('geo_polygon_union_convex', a, b)
 
 def polygon_intersection(a, b):
-    return _convex_bool('geo_polygon_intersection_convex_wgs84', a, b)
+    return _convex_bool('geo_polygon_intersection_convex', a, b)
 
 def polygon_difference(a, b):
-    return _convex_bool('geo_polygon_difference_convex_wgs84', a, b)
+    return _convex_bool('geo_polygon_difference_convex', a, b)
 
 def polygon_xor(a, b):
-    return _convex_bool('geo_polygon_xor_convex_wgs84', a, b)
+    return _convex_bool('geo_polygon_xor_convex', a, b)
 
 def polygon_not(subject, mask):
     return polygon_difference(mask, subject)
@@ -1292,31 +1292,31 @@ def parse_geojson(data: str | dict[str, Any]) -> GeoPointData | GeoPolygon | Geo
     if t == 'FeatureCollection': return [parse_geometry(f['geometry']) for f in payload.get('features', [])]
     raise ValueError(f'Unsupported GeoJSON payload type: {t!r}')
 
-def geodesic_inverse_wgs84(a_lat_deg: float, a_lon_deg: float, b_lat_deg: float, b_lon_deg: float) -> dict:
+def geodesic_inverse(a_lat_deg: float, a_lon_deg: float, b_lat_deg: float, b_lon_deg: float) -> dict:
     a = GeoLLH(a_lat_deg, a_lon_deg, 0.0)
     b = GeoLLH(b_lat_deg, b_lon_deg, 0.0)
     out = GeoGeodesicInverseResult()
-    _check(_sdk_lib.geo_sdk_llh_geodesic_inverse_wgs84(ctypes.byref(a), ctypes.byref(b), ctypes.byref(out)),
-           "geo_llh_geodesic_inverse_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_llh_geodesic_inverse(ctypes.byref(a), ctypes.byref(b), ctypes.byref(out)),
+           "geo_llh_geodesic_inverse failed")
     return {
         "distance_m": float(out.distance_m),
         "initial_bearing_deg": float(out.initial_bearing_deg),
         "final_bearing_deg": float(out.final_bearing_deg),
     }
 
-def geodesic_direct_wgs84(lat_deg: float, lon_deg: float, initial_bearing_deg: float, distance_m: float, h_m: float = 0.0) -> tuple[float, float, float]:
+def geodesic_direct(lat_deg: float, lon_deg: float, initial_bearing_deg: float, distance_m: float, h_m: float = 0.0) -> tuple[float, float, float]:
     start = GeoLLH(lat_deg, lon_deg, h_m)
     out = GeoLLH()
-    _check(_sdk_lib.geo_sdk_llh_geodesic_direct_wgs84(ctypes.byref(start), initial_bearing_deg, distance_m, ctypes.byref(out)),
-           "geo_llh_geodesic_direct_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_llh_geodesic_direct(ctypes.byref(start), initial_bearing_deg, distance_m, ctypes.byref(out)),
+           "geo_llh_geodesic_direct failed")
     return (out.lat_deg, out.lon_deg, out.h_m)
 
-def geodesic_interpolate_wgs84(a_lat_deg: float, a_lon_deg: float, b_lat_deg: float, b_lon_deg: float, fraction: float) -> tuple[float, float, float]:
+def geodesic_interpolate(a_lat_deg: float, a_lon_deg: float, b_lat_deg: float, b_lon_deg: float, fraction: float) -> tuple[float, float, float]:
     a = GeoLLH(a_lat_deg, a_lon_deg, 0.0)
     b = GeoLLH(b_lat_deg, b_lon_deg, 0.0)
     out = GeoLLH()
-    _check(_sdk_lib.geo_sdk_llh_geodesic_interpolate_wgs84(ctypes.byref(a), ctypes.byref(b), fraction, ctypes.byref(out)),
-           "geo_llh_geodesic_interpolate_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_llh_geodesic_interpolate(ctypes.byref(a), ctypes.byref(b), fraction, ctypes.byref(out)),
+           "geo_llh_geodesic_interpolate failed")
     return (out.lat_deg, out.lon_deg, out.h_m)
 
 def crs_from_epsg(epsg: int) -> dict:
@@ -1334,7 +1334,7 @@ def crs_normalize_epsg(epsg: int) -> int:
     return int(out.value)
 
 
-def imagery_fit_affine_tie_points_wgs84(tie_points: list[dict]) -> tuple[dict, dict]:
+def imagery_fit_affine_tie_points(tie_points: list[dict]) -> tuple[dict, dict]:
     if not tie_points:
         raise ValueError("tie_points must be non-empty")
     arr_t = GeoTiePoint * len(tie_points)
@@ -1348,8 +1348,8 @@ def imagery_fit_affine_tie_points_wgs84(tie_points: list[dict]) -> tuple[dict, d
 
     model = GeoTiePointAffineModel()
     stats = GeoTiePointFitStats()
-    _check(_sdk_lib.geo_sdk_imagery_fit_affine_tie_points_wgs84(arr, len(tie_points), ctypes.byref(model), ctypes.byref(stats)),
-           "geo_imagery_fit_affine_tie_points_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_imagery_fit_affine_tie_points(arr, len(tie_points), ctypes.byref(model), ctypes.byref(stats)),
+           "geo_imagery_fit_affine_tie_points failed")
 
     model_out = {
         "lat_coeff": [float(v) for v in model.lat_coeff],
@@ -1364,18 +1364,18 @@ def imagery_fit_affine_tie_points_wgs84(tie_points: list[dict]) -> tuple[dict, d
     }
     return model_out, stats_out
 
-def imagery_project_pixel_wgs84(model: dict, image_px: float, image_py: float) -> tuple[float, float, float]:
+def imagery_project_pixel(model: dict, image_px: float, image_py: float) -> tuple[float, float, float]:
     m = GeoTiePointAffineModel()
     for i in range(3):
         m.lat_coeff[i] = float(model["lat_coeff"][i])
         m.lon_coeff[i] = float(model["lon_coeff"][i])
         m.h_coeff[i] = float(model["h_coeff"][i])
     out = GeoLLH()
-    _check(_sdk_lib.geo_sdk_imagery_project_pixel_wgs84(ctypes.byref(m), float(image_px), float(image_py), ctypes.byref(out)),
-           "geo_imagery_project_pixel_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_imagery_project_pixel(ctypes.byref(m), float(image_px), float(image_py), ctypes.byref(out)),
+           "geo_imagery_project_pixel failed")
     return (float(out.lat_deg), float(out.lon_deg), float(out.h_m))
 
-def imagery_solve_tie_points_wgs84(tie_points: list[dict]) -> dict:
+def imagery_solve_tie_points(tie_points: list[dict]) -> dict:
     if not tie_points:
         raise ValueError("tie_points must be non-empty")
     arr_t = GeoTiePoint * len(tie_points)
@@ -1387,8 +1387,8 @@ def imagery_solve_tie_points_wgs84(tie_points: list[dict]) -> dict:
         arr[i].sigma_px = float(tp.get("sigma_px", 1.0))
         arr[i].sigma_m = float(tp.get("sigma_m", 1.0))
     stats = GeoTiePointFitStats()
-    _check(_sdk_lib.geo_sdk_imagery_solve_tie_points_wgs84(arr, len(tie_points), ctypes.byref(stats)),
-           "geo_imagery_solve_tie_points_wgs84 failed")
+    _check(_sdk_lib.geo_sdk_imagery_solve_tie_points(arr, len(tie_points), ctypes.byref(stats)),
+           "geo_imagery_solve_tie_points failed")
     return {
         "inlier_count": int(stats.inlier_count),
         "total_count": int(stats.total_count),

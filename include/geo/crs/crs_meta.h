@@ -9,9 +9,9 @@ extern "C" {
 #endif
 
 typedef enum {
-  GEO_CRS_KIND_WGS84_GEODETIC = 1,
-  GEO_CRS_KIND_ECEF_WGS84 = 2,
-  GEO_CRS_KIND_UTM_WGS84 = 3
+  GEO_CRS_KIND_GEODETIC = 1,
+  GEO_CRS_KIND_ECEF = 2,
+  GEO_CRS_KIND_UTM = 3
 } geo_crs_kind_t;
 
 typedef struct {
