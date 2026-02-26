@@ -3,6 +3,9 @@
 
 #include <stddef.h>
 
+
+#include <stdint.h>
+
 typedef enum {
   GEO_OK = 0,
   GEO_ERR_RANGE = 1,
@@ -46,5 +49,12 @@ typedef struct {
   unsigned int has_mgrs_cache;
   unsigned int has_geohash_cache;
 } geo_point_t;
+
+
+typedef struct {
+  uint64_t* ids;
+  geo_point_t* points;
+  size_t count;
+} geo_bulk_points_t;
 
 #endif

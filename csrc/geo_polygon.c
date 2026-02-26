@@ -261,3 +261,74 @@ geo_status_t geo_polygon_xor_convex_wgs84(const geo_llh_t* a, size_t a_count,
     if (in == 0) return geo_polygon_union_convex_wgs84(a,a_count,b,b_count,out_points,out_capacity,out_count);
     return GEO_ERR_UNSUPPORTED;
 }
+
+
+geo_status_t geo_polygon_perimeter_m_wgs84(const geo_llh_t* outer, size_t outer_count,
+                                            double* out_perimeter_m) {
+    size_t i;
+    double total = 0.0;
+    if (!outer || !out_perimeter_m || outer_count < 3) return GEO_ERR_PARSE;
+    for (i = 0; i < outer_count; i++) {
+        double d;
+        geo_status_t st = geo_llh_distance_surface_m_wgs84(&outer[i], &outer[(i + 1u) % outer_count], &d);
+        if (st != GEO_OK) return st;
+        total += d;
+    }
+    *out_perimeter_m = total;
+    return GEO_OK;
+}
+
+geo_status_t geo_polygon_position_at_distance_wgs84(const geo_llh_t* outer, size_t outer_count,
+                                                     double distance_m,
+                                                     int from_end,
+                                                     int cyclic,
+                                                     geo_llh_t* out_point) {
+    size_t i;
+    double perimeter;
+    double remaining;
+    if (!outer || !out_point || outer_count < 3) return GEO_ERR_PARSE;
+    if (distance_m < 0.0) return GEO_ERR_RANGE;
+
+    if (geo_polygon_perimeter_m_wgs84(outer, outer_count, &perimeter) != GEO_OK) return GEO_ERR_PARSE;
+    if (perimeter <= 0.0) {
+        *out_point = outer[0];
+        return GEO_OK;
+    }
+
+    remaining = cyclic ? fmod(distance_m, perimeter) : distance_m;
+    if (!cyclic && remaining >= perimeter) {
+        if (from_end) *out_point = outer[0];
+        else *out_point = outer[0];
+        return GEO_OK;
+    }
+
+    if (from_end) {
+        for (i = outer_count; i > 0; i--) {
+            size_t idx = i - 1u;
+            size_t prev = idx == 0 ? outer_count - 1u : idx - 1u;
+            double seg;
+            geo_status_t st = geo_llh_distance_surface_m_wgs84(&outer[idx], &outer[prev], &seg);
+            if (st != GEO_OK) return st;
+            if (remaining <= seg) {
+                double frac = seg == 0.0 ? 0.0 : (remaining / seg);
+                return geo_llh_geodesic_interpolate_wgs84(&outer[idx], &outer[prev], frac, out_point);
+            }
+            remaining -= seg;
+        }
+    } else {
+        for (i = 0; i < outer_count; i++) {
+            size_t j = (i + 1u) % outer_count;
+            double seg;
+            geo_status_t st = geo_llh_distance_surface_m_wgs84(&outer[i], &outer[j], &seg);
+            if (st != GEO_OK) return st;
+            if (remaining <= seg) {
+                double frac = seg == 0.0 ? 0.0 : (remaining / seg);
+                return geo_llh_geodesic_interpolate_wgs84(&outer[i], &outer[j], frac, out_point);
+            }
+            remaining -= seg;
+        }
+    }
+
+    *out_point = outer[0];
+    return GEO_OK;
+}

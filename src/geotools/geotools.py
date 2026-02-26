@@ -2,7 +2,7 @@ import os
 import sys
 import ctypes
 from ctypes import (
-    c_int, c_char, c_double, c_size_t, c_char_p, c_uint,
+    c_int, c_char, c_double, c_size_t, c_char_p, c_uint, c_uint64,
     POINTER, Structure
 )
 
@@ -112,6 +112,14 @@ class GeoPoint(Structure):
         ("has_utm_cache", c_uint),
         ("has_mgrs_cache", c_uint),
         ("has_geohash_cache", c_uint),
+    ]
+
+
+class GeoBulkPoints(Structure):
+    _fields_ = [
+        ("ids", POINTER(c_uint64)),
+        ("points", POINTER(GeoPoint)),
+        ("count", c_size_t),
     ]
 
 
@@ -273,6 +281,23 @@ _lib.geo_points_distance_surface_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(
 _lib.geo_points_distance_surface_m_wgs84.restype  = c_int
 _lib.geo_points_distance_surface_with_elevation_m_wgs84.argtypes = [POINTER(GeoPoint), POINTER(GeoPoint), c_size_t, POINTER(c_double)]
 _lib.geo_points_distance_surface_with_elevation_m_wgs84.restype  = c_int
+
+_lib.geo_bulk_points_init_from_llh_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(c_uint64), POINTER(GeoLLH), c_size_t]
+_lib.geo_bulk_points_init_from_llh_wgs84.restype = c_int
+_lib.geo_bulk_points_init_from_ecef.argtypes = [POINTER(GeoBulkPoints), POINTER(c_uint64), POINTER(GeoECEF), c_size_t]
+_lib.geo_bulk_points_init_from_ecef.restype = c_int
+_lib.geo_bulk_points_free.argtypes = [POINTER(GeoBulkPoints)]
+_lib.geo_bulk_points_free.restype = c_int
+_lib.geo_bulk_points_to_llh_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_size_t]
+_lib.geo_bulk_points_to_llh_wgs84.restype = c_int
+_lib.geo_bulk_points_to_ecef.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoECEF), c_size_t]
+_lib.geo_bulk_points_to_ecef.restype = c_int
+_lib.geo_bulk_points_filter_proximity_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_double, c_int, c_size_t, POINTER(c_uint64), c_size_t, POINTER(c_size_t)]
+_lib.geo_bulk_points_filter_proximity_wgs84.restype = c_int
+_lib.geo_bulk_points_filter_polygon_wgs84.argtypes = [POINTER(GeoBulkPoints), POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, c_double, c_int, c_size_t, POINTER(c_uint64), c_size_t, POINTER(c_size_t)]
+_lib.geo_bulk_points_filter_polygon_wgs84.restype = c_int
+_lib.geo_filter_polygons_by_polygon_wgs84.argtypes = [POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), c_size_t, c_double, c_int, c_int, c_size_t, POINTER(c_size_t), c_size_t, POINTER(c_size_t)]
+_lib.geo_filter_polygons_by_polygon_wgs84.restype = c_int
 
 
 # geodesy + CRS
@@ -642,6 +667,136 @@ import json
 from dataclasses import dataclass
 from typing import Any
 
+class BulkGeoPoints:
+    def __init__(self, points: list[Point] | None = None, ids: list[int] | None = None,
+                 llh_points: list[tuple[float, float, float]] | None = None,
+                 ecef_points: list[tuple[float, float, float]] | None = None):
+        self._bulk = GeoBulkPoints()
+        self._closed = False
+        n = 0
+        if points is not None:
+            llh_points = [p.llh for p in points]
+
+        if llh_points is not None:
+            n = len(llh_points)
+            if ids is None:
+                ids = list(range(n))
+            if len(ids) != n:
+                raise ValueError("ids length must match point list length")
+            ids_arr_t = c_uint64 * n
+            llh_arr_t = GeoLLH * n
+            ids_arr = ids_arr_t(*[int(v) for v in ids])
+            llh_arr = llh_arr_t(*[GeoLLH(float(p[0]), float(p[1]), float(p[2])) for p in llh_points])
+            _check(_lib.geo_bulk_points_init_from_llh_wgs84(ctypes.byref(self._bulk), ids_arr, llh_arr, n),
+                   "geo_bulk_points_init_from_llh_wgs84 failed")
+        elif ecef_points is not None:
+            n = len(ecef_points)
+            if ids is None:
+                ids = list(range(n))
+            if len(ids) != n:
+                raise ValueError("ids length must match point list length")
+            ids_arr_t = c_uint64 * n
+            ecef_arr_t = GeoECEF * n
+            ids_arr = ids_arr_t(*[int(v) for v in ids])
+            ecef_arr = ecef_arr_t(*[GeoECEF(float(p[0]), float(p[1]), float(p[2])) for p in ecef_points])
+            _check(_lib.geo_bulk_points_init_from_ecef(ctypes.byref(self._bulk), ids_arr, ecef_arr, n),
+                   "geo_bulk_points_init_from_ecef failed")
+        else:
+            raise ValueError("BulkGeoPoints requires points, llh_points, or ecef_points")
+
+    def close(self) -> None:
+        if not self._closed:
+            _check(_lib.geo_bulk_points_free(ctypes.byref(self._bulk)), "geo_bulk_points_free failed")
+            self._closed = True
+
+    def __del__(self):
+        try:
+            self.close()
+        except Exception:
+            pass
+
+    @property
+    def count(self) -> int:
+        return int(self._bulk.count)
+
+    def to_llh(self) -> list[tuple[float, float, float]]:
+        n = self.count
+        out_t = GeoLLH * n
+        out = out_t()
+        _check(_lib.geo_bulk_points_to_llh_wgs84(ctypes.byref(self._bulk), out, n), "geo_bulk_points_to_llh_wgs84 failed")
+        return [(float(out[i].lat_deg), float(out[i].lon_deg), float(out[i].h_m)) for i in range(n)]
+
+    def proximity_filter(self, point_of_interest, buffer_m: float,
+                         *, include_within: bool = True, thread_count: int = 0) -> list[int]:
+        if isinstance(point_of_interest, Point):
+            lat, lon, h = point_of_interest.llh
+            poi = GeoLLH(lat, lon, h)
+        else:
+            poi = GeoLLH(float(point_of_interest.lat_deg), float(point_of_interest.lon_deg), float(point_of_interest.h_m))
+        cap = max(1, self.count)
+        ids_t = c_uint64 * cap
+        out_ids = ids_t()
+        out_n = c_size_t()
+        _check(_lib.geo_bulk_points_filter_proximity_wgs84(ctypes.byref(self._bulk), ctypes.byref(poi), float(buffer_m),
+               1 if include_within else 0, int(thread_count), out_ids, cap, ctypes.byref(out_n)),
+               "geo_bulk_points_filter_proximity_wgs84 failed")
+        return [int(out_ids[i]) for i in range(out_n.value)]
+
+    def polygon_filter(self, polygon: "GeoPolygon", *, buffer_m: float = 0.0,
+                       include_inside: bool = True, thread_count: int = 0) -> list[int]:
+        o_arr = _ring_to_arr(polygon.outer)
+        h_arr, off_arr, cnt_arr, hn = polygon._holes_flat()
+        cap = max(1, self.count)
+        ids_t = c_uint64 * cap
+        out_ids = ids_t()
+        out_n = c_size_t()
+        _check(_lib.geo_bulk_points_filter_polygon_wgs84(ctypes.byref(self._bulk), o_arr, len(polygon.outer),
+               h_arr, off_arr, cnt_arr, hn, float(buffer_m), 1 if include_inside else 0,
+               int(thread_count), out_ids, cap, ctypes.byref(out_n)),
+               "geo_bulk_points_filter_polygon_wgs84 failed")
+        return [int(out_ids[i]) for i in range(out_n.value)]
+
+
+def filter_polygons_by_polygon(polygons: list["GeoPolygon"], polygon_of_interest: "GeoPolygon", *,
+                               interest_buffer_m: float = 0.0, require_full_containment: bool = False,
+                               include_inside: bool = True, thread_count: int = 0):
+    if len(polygons) == 0:
+        return []
+    all_pts = []
+    offsets = []
+    counts = []
+    off = 0
+    for p in polygons:
+        offsets.append(off)
+        counts.append(len(p.outer))
+        all_pts.extend(p.outer)
+        off += len(p.outer)
+    pts = _ring_to_arr(all_pts)
+    off_t = c_size_t * len(offsets)
+    cnt_t = c_size_t * len(counts)
+    out_t = c_size_t * len(polygons)
+    out = out_t()
+    out_n = c_size_t()
+    poi_outer = _ring_to_arr(polygon_of_interest.outer)
+    _check(_lib.geo_filter_polygons_by_polygon_wgs84(pts, off_t(*offsets), cnt_t(*counts), len(polygons),
+           poi_outer, len(polygon_of_interest.outer), float(interest_buffer_m),
+           1 if require_full_containment else 0, 1 if include_inside else 0,
+           int(thread_count), out, len(polygons), ctypes.byref(out_n)),
+           "geo_filter_polygons_by_polygon_wgs84 failed")
+    return [polygons[int(out[i])] for i in range(out_n.value)]
+
+
+
+# polyline C APIs
+_lib.geo_polyline_length_m_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
+_lib.geo_polyline_length_m_wgs84.restype = c_int
+_lib.geo_polyline_distance_to_point_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(c_double)]
+_lib.geo_polyline_distance_to_point_wgs84.restype = c_int
+_lib.geo_polyline_position_at_distance_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, POINTER(GeoLLH)]
+_lib.geo_polyline_position_at_distance_wgs84.restype = c_int
+
+
+
 # polygon C APIs
 _lib.geo_polygon_area_m2_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(c_double)]
 _lib.geo_polygon_area_m2_wgs84.restype = c_int
@@ -649,6 +804,10 @@ _lib.geo_polygon_contains_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(G
 _lib.geo_polygon_contains_wgs84.restype = c_int
 _lib.geo_polygon_distance_to_point_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(GeoLLH), POINTER(c_int), POINTER(c_double)]
 _lib.geo_polygon_distance_to_point_wgs84.restype = c_int
+_lib.geo_polygon_perimeter_m_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
+_lib.geo_polygon_perimeter_m_wgs84.restype = c_int
+_lib.geo_polygon_position_at_distance_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, c_int, POINTER(GeoLLH)]
+_lib.geo_polygon_position_at_distance_wgs84.restype = c_int
 _lib.geo_multipolygon_area_m2_wgs84.argtypes = [POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(c_double)]
 _lib.geo_multipolygon_area_m2_wgs84.restype = c_int
 _lib.geo_polygon_intersection_convex_wgs84.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_size_t, POINTER(c_size_t)]
@@ -686,16 +845,91 @@ def _ring_to_arr(ring: list[GeoPointData]):
     return arr
 
 
+class GeoPolyline:
+    def __init__(self, points):
+        self._points = [_to_geopoint(p) for p in points]
+        if len(self._points) < 2:
+            raise ValueError('GeoPolyline requires at least 2 points')
+        self._length_cache_m = None
+
+    @property
+    def points(self):
+        return self._points
+
+    @points.setter
+    def points(self, value):
+        self._points = [_to_geopoint(p) for p in value]
+        if len(self._points) < 2:
+            raise ValueError('GeoPolyline requires at least 2 points')
+        self._length_cache_m = None
+
+    def _arr(self):
+        return _ring_to_arr(self._points)
+
+    @property
+    def total_length_m(self):
+        if self._length_cache_m is None:
+            out = c_double()
+            arr = self._arr()
+            _check(_lib.geo_polyline_length_m_wgs84(arr, len(self._points), ctypes.byref(out)), 'geo_polyline_length_m_wgs84 failed')
+            self._length_cache_m = float(out.value)
+        return self._length_cache_m
+
+    def distance_to_point(self, point, *, return_nearest_point=False):
+        arr = self._arr()
+        p = _to_geopoint(point)
+        gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
+        near = GeoLLH()
+        out = c_double()
+        _check(_lib.geo_polyline_distance_to_point_wgs84(arr, len(self._points), ctypes.byref(gp),
+               1 if return_nearest_point else 0, ctypes.byref(near), ctypes.byref(out)),
+               'geo_polyline_distance_to_point_wgs84 failed')
+        d = {'distance_m': float(out.value)}
+        if return_nearest_point:
+            d['nearest_point'] = GeoPointData(near.lat_deg, near.lon_deg, near.h_m)
+        return d
+
+    def position_at_distance(self, distance_m, *, from_end=False):
+        arr = self._arr()
+        out = GeoLLH()
+        _check(_lib.geo_polyline_position_at_distance_wgs84(arr, len(self._points), float(distance_m),
+               1 if from_end else 0, ctypes.byref(out)),
+               'geo_polyline_position_at_distance_wgs84 failed')
+        return GeoPointData(out.lat_deg, out.lon_deg, out.h_m)
+
+
+
 class GeoPolygon:
     def __init__(self, outer, holes=None):
-        self.outer = [_to_geopoint(p) for p in outer]
-        self.holes = [[_to_geopoint(p) for p in ring] for ring in (holes or [])]
-        if len(self.outer) < 3:
+        self._outer = [_to_geopoint(p) for p in outer]
+        self._holes = [[_to_geopoint(p) for p in ring] for ring in (holes or [])]
+        self._perimeter_cache_m = None
+        if len(self._outer) < 3:
             raise ValueError('GeoPolygon outer ring requires at least 3 points')
+
+    @property
+    def outer(self):
+        return self._outer
+
+    @outer.setter
+    def outer(self, value):
+        self._outer = [_to_geopoint(p) for p in value]
+        if len(self._outer) < 3:
+            raise ValueError('GeoPolygon outer ring requires at least 3 points')
+        self._perimeter_cache_m = None
+
+    @property
+    def holes(self):
+        return self._holes
+
+    @holes.setter
+    def holes(self, value):
+        self._holes = [[_to_geopoint(p) for p in ring] for ring in value]
+        self._perimeter_cache_m = None
 
     def _holes_flat(self):
         pts=[]; offsets=[]; counts=[]; off=0
-        for r in self.holes:
+        for r in self._holes:
             offsets.append(off); counts.append(len(r)); pts.extend(r); off += len(r)
         if len(pts)==0:
             return (None, None, None, 0)
@@ -706,28 +940,45 @@ class GeoPolygon:
 
     @property
     def area_m2(self):
-        o_arr = _ring_to_arr(self.outer)
+        o_arr = _ring_to_arr(self._outer)
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         out = c_double()
-        _check(_lib.geo_polygon_area_m2_wgs84(o_arr, len(self.outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(out)), 'geo_polygon_area_m2_wgs84 failed')
+        _check(_lib.geo_polygon_area_m2_wgs84(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(out)), 'geo_polygon_area_m2_wgs84 failed')
         return float(out.value)
+
+    @property
+    def perimeter_m(self):
+        if self._perimeter_cache_m is None:
+            o_arr = _ring_to_arr(self._outer)
+            out = c_double()
+            _check(_lib.geo_polygon_perimeter_m_wgs84(o_arr, len(self._outer), ctypes.byref(out)), 'geo_polygon_perimeter_m_wgs84 failed')
+            self._perimeter_cache_m = float(out.value)
+        return self._perimeter_cache_m
+
+    def position_at_distance(self, distance_m, *, from_end=False, cyclic=True):
+        o_arr = _ring_to_arr(self._outer)
+        out = GeoLLH()
+        _check(_lib.geo_polygon_position_at_distance_wgs84(o_arr, len(self._outer), float(distance_m),
+               1 if from_end else 0, 1 if cyclic else 0, ctypes.byref(out)),
+               'geo_polygon_position_at_distance_wgs84 failed')
+        return GeoPointData(out.lat_deg, out.lon_deg, out.h_m)
 
     def contains(self, point):
         p = _to_geopoint(point)
-        o_arr = _ring_to_arr(self.outer)
+        o_arr = _ring_to_arr(self._outer)
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         inside = c_int()
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
-        _check(_lib.geo_polygon_contains_wgs84(o_arr, len(self.outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(gp), ctypes.byref(inside)), 'geo_polygon_contains_wgs84 failed')
+        _check(_lib.geo_polygon_contains_wgs84(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(gp), ctypes.byref(inside)), 'geo_polygon_contains_wgs84 failed')
         return bool(inside.value)
 
     def distance_to_point(self, point, *, return_nearest_edge_point=False, return_nearest_vertices=False):
         p = _to_geopoint(point)
-        o_arr = _ring_to_arr(self.outer)
+        o_arr = _ring_to_arr(self._outer)
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
         edge = GeoLLH(); v1 = GeoLLH(); v2 = GeoLLH(); inside = c_int(); d = c_double()
-        _check(_lib.geo_polygon_distance_to_point_wgs84(o_arr, len(self.outer), h_arr, off_arr, cnt_arr, hn,
+        _check(_lib.geo_polygon_distance_to_point_wgs84(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn,
                ctypes.byref(gp), 1 if return_nearest_edge_point else 0, ctypes.byref(edge),
                1 if return_nearest_vertices else 0, ctypes.byref(v1), ctypes.byref(v2), ctypes.byref(inside), ctypes.byref(d)),
                'geo_polygon_distance_to_point_wgs84 failed')

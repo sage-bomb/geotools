@@ -46,7 +46,7 @@ def build_shared_library() -> Path:
         cmd += ["-shared"]
     cmd += [f"-I{inc}" for inc in include_dirs]
     cmd += [str(c) for c in c_files]
-    cmd += ["-o", str(out_path), "-lm"]
+    cmd += ["-o", str(out_path), "-lm", "-pthread"]
     subprocess.check_call(cmd)
     return out_path
 
