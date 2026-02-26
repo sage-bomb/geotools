@@ -1,8 +1,7 @@
-#ifndef GEO_INTERNAL_H
-#define GEO_INTERNAL_H
+#ifndef GEO_CORE_INTERNAL_H
+#define GEO_CORE_INTERNAL_H
 
 #include "geo/geo.h"
-
 #include <stddef.h>
 
 typedef struct {

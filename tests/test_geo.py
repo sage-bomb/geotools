@@ -37,8 +37,8 @@ if str(SRC_ROOT) not in sys.path:
 def build_shared_library() -> Path:
     so_name = "libgeotools.dylib" if sys.platform == "darwin" else "libgeotools.so"
     out_path = SRC_ROOT / "geotools" / so_name
-    c_files = sorted((REPO_ROOT / "csrc").glob("*.c"))
-    include_dirs = [REPO_ROOT / "csrc", REPO_ROOT / "include"]
+    c_files = sorted((REPO_ROOT / "csrc").rglob("*.c"))
+    include_dirs = [REPO_ROOT / "include", REPO_ROOT / "csrc", REPO_ROOT / "csrc" / "core", REPO_ROOT / "csrc" / "crs", REPO_ROOT / "csrc" / "index", REPO_ROOT / "csrc" / "vector"]
     cmd = ["cc", "-O2", "-fPIC"]
     if sys.platform == "darwin":
         cmd += ["-dynamiclib"]
@@ -48,6 +48,18 @@ def build_shared_library() -> Path:
     cmd += [str(c) for c in c_files]
     cmd += ["-o", str(out_path), "-lm", "-pthread"]
     subprocess.check_call(cmd)
+    sdk_name = "libgeotools_sdk.dylib" if sys.platform == "darwin" else "libgeotools_sdk.so"
+    sdk_out = SRC_ROOT / "geotools" / sdk_name
+    sdk_cmd = [
+        "g++", "-std=c++17", "-O2", "-fPIC",
+        "-dynamiclib" if sys.platform == "darwin" else "-shared",
+        "-Iinclude",
+        *[str(c) for c in sorted((REPO_ROOT / "cppsrc").glob("*.cpp"))],
+        "-L" + str(SRC_ROOT / "geotools"), "-lgeotools",
+        "-Wl,-rpath,$ORIGIN",
+        "-o", str(sdk_out),
+    ]
+    subprocess.check_call([x for x in sdk_cmd if x])
     return out_path
 
 

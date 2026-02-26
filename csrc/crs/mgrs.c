@@ -1,4 +1,4 @@
-#include "geo_internal.h"
+#include "internal.h"
 
 #include <ctype.h>
 #include <math.h>

@@ -1,4 +1,4 @@
-#include "geo_internal.h"
+#include "internal.h"
 
 #include <pthread.h>
 #include <stdlib.h>
