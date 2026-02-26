@@ -1,4 +1,4 @@
-#include "geo_internal.h"
+#include "internal.h"
 
 static const wgs84_ellipsoid_t WGS84 = {
     6378137.0,

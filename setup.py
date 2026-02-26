@@ -94,10 +94,17 @@ class build_py(_build_py):
         super().run()
 
         repo = Path(__file__).resolve().parent
-        c_files = sorted((repo / "csrc").glob("*.c"))
+        c_files = sorted((repo / "csrc").rglob("*.c"))
         if not c_files:
             raise FileNotFoundError("Missing C source files under csrc/")
-        include_dirs = [repo / "csrc", repo / "include"]
+        include_dirs = [
+            repo / "include",
+            repo / "csrc",
+            repo / "csrc" / "core",
+            repo / "csrc" / "crs",
+            repo / "csrc" / "index",
+            repo / "csrc" / "vector",
+        ]
 
         so_name = _shared_lib_name()
 

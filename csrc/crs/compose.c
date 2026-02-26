@@ -1,4 +1,4 @@
-#include "geo_internal.h"
+#include "internal.h"
 
 geo_status_t geo_ll_to_mgrs_impl(double lat_deg, double lon_deg, int precision, char* out, size_t out_sz) {
     geo_utm_t u;
