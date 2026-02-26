@@ -324,21 +324,21 @@ geo_status_t geo_sdk_ecef_distance_surface_with_elevation_m(const geo_ecef_t* a,
 geo_status_t geo_sdk_llh_geodesic_inverse(const geo_llh_t* a, const geo_llh_t* b, geo_geodesic_inverse_result_t* out) {
   if (!a || !b || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_llh_geodesic_inverse(a, b, out);
+  return geo_geodesic_inverse(NULL, a, b, NULL, &out->distance_m, &out->initial_bearing_deg, &out->final_bearing_deg);
   SDK_TRY_END
 }
 
 geo_status_t geo_sdk_llh_geodesic_direct(const geo_llh_t* start, double initial_bearing_deg, double distance_m, geo_llh_t* out_end) {
   if (!start || !out_end) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_llh_geodesic_direct(start, initial_bearing_deg, distance_m, out_end);
+  return geo_geodesic_direct(NULL, start, initial_bearing_deg, distance_m, NULL, out_end, NULL);
   SDK_TRY_END
 }
 
 geo_status_t geo_sdk_llh_geodesic_interpolate(const geo_llh_t* a, const geo_llh_t* b, double fraction, geo_llh_t* out) {
   if (!a || !b || !out) return GEO_ERR_PARSE;
   SDK_TRY_BEGIN
-  return geo_llh_geodesic_interpolate(a, b, fraction, out);
+  return geo_geodesic_interpolate(NULL, a, b, fraction, NULL, out);
   SDK_TRY_END
 }
 

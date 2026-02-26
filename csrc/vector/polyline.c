@@ -30,7 +30,7 @@ geo_status_t geo_polyline_distance_to_point(const geo_ellipsoid_t* ellip,const g
 
 geo_status_t geo_polyline_position_at_distance(const geo_ellipsoid_t* ellip,const geo_llh_t* points,size_t n,double distance_m,int from_end,const geo_compute_opts_t* opts,geo_llh_t* out){
   if(!points||!out||n<2) return GEO_ERR_PARSE; if(distance_m<0) return GEO_ERR_RANGE; double rem=distance_m;
-  if(from_end){ for(size_t i=n-1;i>0;i--){double d; geo_status_t st=seg_dist(ellip,&points[i],&points[i-1],opts,&d); if(st!=GEO_OK)return st; if(rem<=d) return geo_llh_geodesic_interpolate(&points[i],&points[i-1],d==0?0:rem/d,out); rem-=d; }}
-  else { for(size_t i=0;i+1<n;i++){double d; geo_status_t st=seg_dist(ellip,&points[i],&points[i+1],opts,&d); if(st!=GEO_OK)return st; if(rem<=d) return geo_llh_geodesic_interpolate(&points[i],&points[i+1],d==0?0:rem/d,out); rem-=d; }}
+  if(from_end){ for(size_t i=n-1;i>0;i--){double d; geo_status_t st=seg_dist(ellip,&points[i],&points[i-1],opts,&d); if(st!=GEO_OK)return st; if(rem<=d) return geo_geodesic_interpolate(NULL, &points[i],&points[i-1],d==0?0:rem/d,NULL,out); rem-=d; }}
+  else { for(size_t i=0;i+1<n;i++){double d; geo_status_t st=seg_dist(ellip,&points[i],&points[i+1],opts,&d); if(st!=GEO_OK)return st; if(rem<=d) return geo_geodesic_interpolate(NULL, &points[i],&points[i+1],d==0?0:rem/d,NULL,out); rem-=d; }}
   *out=from_end?points[0]:points[n-1]; return GEO_OK;
 }

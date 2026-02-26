@@ -93,6 +93,13 @@ class GeoGeodesicInverseResult(Structure):
         ("final_bearing_deg", c_double),
     ]
 
+
+class GeoEllipsoid(Structure):
+    _fields_ = [("a", c_double), ("f", c_double)]
+
+class GeoComputeOpts(Structure):
+    _fields_ = [("mode", c_int), ("max_local_radius_m", c_double), ("allow_fallback", c_int)]
+
 class GeoCRS(Structure):
     _fields_ = [
         ("epsg", c_int),
@@ -993,11 +1000,11 @@ def filter_polygons_by_polygon(polygons: list["GeoPolygon"], polygon_of_interest
 
 
 # polyline C APIs
-_lib.geo_polyline_length_m.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
+_lib.geo_polyline_length_m.argtypes = [POINTER(GeoEllipsoid), POINTER(GeoLLH), c_size_t, POINTER(GeoComputeOpts), POINTER(c_double)]
 _lib.geo_polyline_length_m.restype = c_int
-_lib.geo_polyline_distance_to_point.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(c_double)]
+_lib.geo_polyline_distance_to_point.argtypes = [POINTER(GeoEllipsoid), POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(GeoComputeOpts), c_int, POINTER(GeoLLH), POINTER(c_double)]
 _lib.geo_polyline_distance_to_point.restype = c_int
-_lib.geo_polyline_position_at_distance.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, POINTER(GeoLLH)]
+_lib.geo_polyline_position_at_distance.argtypes = [POINTER(GeoEllipsoid), POINTER(GeoLLH), c_size_t, c_double, c_int, POINTER(GeoComputeOpts), POINTER(GeoLLH)]
 _lib.geo_polyline_position_at_distance.restype = c_int
 
 
@@ -1005,10 +1012,10 @@ _lib.geo_polyline_position_at_distance.restype = c_int
 # polygon C APIs
 _lib.geo_polygon_area_m2.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(c_double)]
 _lib.geo_polygon_area_m2.restype = c_int
-_lib.geo_polygon_contains.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), POINTER(c_int)]
+_lib.geo_polygon_contains.argtypes = [POINTER(GeoEllipsoid), POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), POINTER(GeoComputeOpts), POINTER(c_int)]
 _lib.geo_polygon_contains.restype = c_int
-_lib.geo_polygon_distance_to_point.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), c_int, POINTER(GeoLLH), c_int, POINTER(GeoLLH), POINTER(GeoLLH), POINTER(c_int), POINTER(c_double)]
-_lib.geo_polygon_distance_to_point.restype = c_int
+_lib.geo_polygon_distance_to_edge.argtypes = [POINTER(GeoEllipsoid), POINTER(GeoLLH), c_size_t, POINTER(GeoLLH), POINTER(c_size_t), POINTER(c_size_t), c_size_t, POINTER(GeoLLH), POINTER(GeoComputeOpts), POINTER(c_double)]
+_lib.geo_polygon_distance_to_edge.restype = c_int
 _lib.geo_polygon_perimeter_m.argtypes = [POINTER(GeoLLH), c_size_t, POINTER(c_double)]
 _lib.geo_polygon_perimeter_m.restype = c_int
 _lib.geo_polygon_position_at_distance.argtypes = [POINTER(GeoLLH), c_size_t, c_double, c_int, c_int, POINTER(GeoLLH)]
@@ -1076,7 +1083,7 @@ class GeoPolyline:
         if self._length_cache_m is None:
             out = c_double()
             arr = self._arr()
-            _check(_lib.geo_polyline_length_m(arr, len(self._points), ctypes.byref(out)), 'geo_polyline_length_m failed')
+            _check(_lib.geo_polyline_length_m(None, arr, len(self._points), None, ctypes.byref(out)), 'geo_polyline_length_m failed')
             self._length_cache_m = float(out.value)
         return self._length_cache_m
 
@@ -1086,7 +1093,7 @@ class GeoPolyline:
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
         near = GeoLLH()
         out = c_double()
-        _check(_lib.geo_polyline_distance_to_point(arr, len(self._points), ctypes.byref(gp),
+        _check(_lib.geo_polyline_distance_to_point(None, arr, len(self._points), ctypes.byref(gp), None,
                1 if return_nearest_point else 0, ctypes.byref(near), ctypes.byref(out)),
                'geo_polyline_distance_to_point failed')
         d = {'distance_m': float(out.value)}
@@ -1097,8 +1104,8 @@ class GeoPolyline:
     def position_at_distance(self, distance_m, *, from_end=False):
         arr = self._arr()
         out = GeoLLH()
-        _check(_lib.geo_polyline_position_at_distance(arr, len(self._points), float(distance_m),
-               1 if from_end else 0, ctypes.byref(out)),
+        _check(_lib.geo_polyline_position_at_distance(None, arr, len(self._points), float(distance_m),
+               1 if from_end else 0, None, ctypes.byref(out)),
                'geo_polyline_position_at_distance failed')
         return GeoPointData(out.lat_deg, out.lon_deg, out.h_m)
 
@@ -1174,7 +1181,7 @@ class GeoPolygon:
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         inside = c_int()
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
-        _check(_lib.geo_polygon_contains(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(gp), ctypes.byref(inside)), 'geo_polygon_contains failed')
+        _check(_lib.geo_polygon_contains(None, o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn, ctypes.byref(gp), None, ctypes.byref(inside)), 'geo_polygon_contains failed')
         return bool(inside.value)
 
     def distance_to_point(self, point, *, return_nearest_edge_point=False, return_nearest_vertices=False):
@@ -1182,16 +1189,11 @@ class GeoPolygon:
         o_arr = _ring_to_arr(self._outer)
         h_arr, off_arr, cnt_arr, hn = self._holes_flat()
         gp = GeoLLH(p.lat_deg, p.lon_deg, p.h_m)
-        edge = GeoLLH(); v1 = GeoLLH(); v2 = GeoLLH(); inside = c_int(); d = c_double()
-        _check(_lib.geo_polygon_distance_to_point(o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn,
-               ctypes.byref(gp), 1 if return_nearest_edge_point else 0, ctypes.byref(edge),
-               1 if return_nearest_vertices else 0, ctypes.byref(v1), ctypes.byref(v2), ctypes.byref(inside), ctypes.byref(d)),
-               'geo_polygon_distance_to_point failed')
-        out={'inside': bool(inside.value), 'distance_to_edge_m': float(d.value)}
-        if return_nearest_edge_point:
-            out['nearest_edge_point'] = GeoPointData(edge.lat_deg, edge.lon_deg, edge.h_m)
-        if return_nearest_vertices:
-            out['nearest_vertices'] = [GeoPointData(v1.lat_deg, v1.lon_deg, v1.h_m), GeoPointData(v2.lat_deg, v2.lon_deg, v2.h_m)]
+        d = c_double()
+        _check(_lib.geo_polygon_distance_to_edge(None, o_arr, len(self._outer), h_arr, off_arr, cnt_arr, hn,
+               ctypes.byref(gp), None, ctypes.byref(d)),
+               'geo_polygon_distance_to_edge failed')
+        out={'inside': self.contains(point), 'distance_to_edge_m': float(d.value)}
         return out
 
 

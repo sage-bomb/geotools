@@ -53,7 +53,4 @@ geo_status_t geo_ecef_distance_surface_with_elevation_impl(const geo_ecef_t* a, 
 #endif
 
 
-typedef struct { double distance_m, initial_bearing_deg, final_bearing_deg; } geo_geodesic_inverse_result_t;
-geo_status_t geo_llh_geodesic_inverse(const geo_llh_t* a,const geo_llh_t* b,geo_geodesic_inverse_result_t* out);
-geo_status_t geo_llh_geodesic_direct(const geo_llh_t* a,double az,double dist,geo_llh_t* out);
-geo_status_t geo_llh_geodesic_interpolate(const geo_llh_t* a,const geo_llh_t* b,double f,geo_llh_t* out);
+

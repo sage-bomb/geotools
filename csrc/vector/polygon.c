@@ -319,7 +319,7 @@ geo_status_t geo_polygon_position_at_distance(const geo_llh_t* outer, size_t out
             if (st != GEO_OK) return st;
             if (remaining <= seg) {
                 double frac = seg == 0.0 ? 0.0 : (remaining / seg);
-                return geo_llh_geodesic_interpolate(&outer[idx], &outer[prev], frac, out_point);
+                return geo_geodesic_interpolate(NULL, &outer[idx], &outer[prev], frac, NULL, out_point);
             }
             remaining -= seg;
         }
@@ -331,7 +331,7 @@ geo_status_t geo_polygon_position_at_distance(const geo_llh_t* outer, size_t out
             if (st != GEO_OK) return st;
             if (remaining <= seg) {
                 double frac = seg == 0.0 ? 0.0 : (remaining / seg);
-                return geo_llh_geodesic_interpolate(&outer[i], &outer[j], frac, out_point);
+                return geo_geodesic_interpolate(NULL, &outer[i], &outer[j], frac, NULL, out_point);
             }
             remaining -= seg;
         }

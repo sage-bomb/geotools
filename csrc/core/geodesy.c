@@ -72,10 +72,17 @@ geo_status_t geo_geodesic_direct(const geo_ellipsoid_t* ellip,const geo_llh_t* a
   (void)o; return GEO_OK;
 }
 
+
+geo_status_t geo_geodesic_interpolate(const geo_ellipsoid_t* ellip,const geo_llh_t* a,const geo_llh_t* b,double f,const geo_compute_opts_t* opts,geo_llh_t* out){
+  double d,ib; if(!a||!b||!out) return GEO_ERR_PARSE; if(f<0||f>1) return GEO_ERR_RANGE;
+  geo_status_t st=geo_geodesic_inverse(ellip,a,b,opts,&d,&ib,NULL); if(st!=GEO_OK) return st;
+  st=geo_geodesic_direct(ellip,a,ib,d*f,opts,out,NULL); if(st==GEO_OK) out->h_m=a->h_m+f*(b->h_m-a->h_m); return st;
+}
+
 geo_status_t geo_llh_geodesic_inverse(const geo_llh_t* a,const geo_llh_t* b,geo_geodesic_inverse_result_t* out){
   if(!out) return GEO_ERR_PARSE; return geo_geodesic_inverse(NULL,a,b,NULL,&out->distance_m,&out->initial_bearing_deg,&out->final_bearing_deg);
 }
 geo_status_t geo_llh_geodesic_direct(const geo_llh_t* a,double az,double dist,geo_llh_t* out){ return geo_geodesic_direct(NULL,a,az,dist,NULL,out,NULL); }
 geo_status_t geo_llh_geodesic_interpolate(const geo_llh_t* a,const geo_llh_t* b,double f,geo_llh_t* out){
-  double d,ib; if(f<0||f>1) return GEO_ERR_RANGE; geo_status_t st=geo_geodesic_inverse(NULL,a,b,NULL,&d,&ib,NULL); if(st!=GEO_OK) return st; st=geo_geodesic_direct(NULL,a,ib,d*f,NULL,out,NULL); if(st==GEO_OK) out->h_m=a->h_m+f*(b->h_m-a->h_m); return st;
+  return geo_geodesic_interpolate(NULL,a,b,f,NULL,out);
 }
