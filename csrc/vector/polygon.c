@@ -1,10 +1,14 @@
 #include "internal.h"
+#include "geo/core/local_tangent.h"
+#include "geo/core/geodesy.h"
 
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
 
 typedef struct { double x,y; } p2_t;
+
+static geo_compute_opts_t nopts(const geo_compute_opts_t* o){ return o?*o:geo_compute_opts_default(); }
 
 static p2_t proj(const geo_llh_t* ref, const geo_llh_t* p) {
     double lat0 = geo_deg2rad(ref->lat_deg);
@@ -35,17 +39,56 @@ static double ring_area(const geo_llh_t* r, size_t n) {
     return fabs(t) * 0.5 * 6371008.8 * 6371008.8;
 }
 
-static int ring_contains(const geo_llh_t* ring, size_t n, const geo_llh_t* p) {
+static int ring_contains_xy(const p2_t* ring, size_t n, p2_t p) {
     size_t i,j; int inside=0;
     if (!ring || n < 3) return 0;
     for (i=0,j=n-1;i<n;j=i++) {
-        double xi=ring[i].lon_deg, yi=ring[i].lat_deg;
-        double xj=ring[j].lon_deg, yj=ring[j].lat_deg;
-        int inter=((yi>p->lat_deg)!=(yj>p->lat_deg)) &&
-          (p->lon_deg < (xj-xi)*(p->lat_deg-yi)/((yj-yi)==0.0?1e-16:(yj-yi))+xi);
+        double xi=ring[i].x, yi=ring[i].y;
+        double xj=ring[j].x, yj=ring[j].y;
+        int inter=((yi>p.y)!=(yj>p.y)) &&
+          (p.x < (xj-xi)*(p.y-yi)/((yj-yi)==0.0?1e-16:(yj-yi))+xi);
         if (inter) inside=!inside;
     }
     return inside;
+}
+
+static void unwrap_relative(const geo_llh_t* in,size_t n,double lon0,geo_llh_t* out){
+    if(!in || !out || n==0) return;
+    for(size_t i=0;i<n;i++) out[i] = in[i];
+    double shift = round((lon0 - out[0].lon_deg) / 360.0) * 360.0;
+    out[0].lon_deg += shift;
+    for(size_t i=1;i<n;i++){
+      double cur = out[i].lon_deg + shift;
+      while(cur - out[i-1].lon_deg > 180.0) cur -= 360.0;
+      while(cur - out[i-1].lon_deg < -180.0) cur += 360.0;
+      out[i].lon_deg = cur;
+    }
+}
+
+static geo_status_t point_segment_mode_distance(const geo_ellipsoid_t* ellip,const geo_llh_t* p,
+                                                const geo_llh_t* a,const geo_llh_t* b,
+                                                const geo_compute_opts_t* opts,double* out_d){
+  const int samples = 24;
+  double best = 1e300, best_t = 0.0;
+  for(int i=0;i<=samples;i++){
+    double t = (double)i / (double)samples;
+    geo_llh_t q;
+    if(geo_geodesic_interpolate(ellip, a, b, t, opts, &q) != GEO_OK) continue;
+    double d;
+    if(geo_geodesic_inverse(ellip, p, &q, opts, &d, NULL, NULL) != GEO_OK) continue;
+    if(d < best){ best = d; best_t = t; }
+  }
+  double lo = fmax(0.0, best_t - 1.0/samples), hi = fmin(1.0, best_t + 1.0/samples);
+  for(int iter=0; iter<20; iter++){
+    double t1 = lo + (hi-lo)/3.0;
+    double t2 = hi - (hi-lo)/3.0;
+    geo_llh_t q1,q2; double d1=1e300,d2=1e300;
+    if(geo_geodesic_interpolate(ellip,a,b,t1,opts,&q1)==GEO_OK) geo_geodesic_inverse(ellip,p,&q1,opts,&d1,NULL,NULL);
+    if(geo_geodesic_interpolate(ellip,a,b,t2,opts,&q2)==GEO_OK) geo_geodesic_inverse(ellip,p,&q2,opts,&d2,NULL,NULL);
+    if(d1 < d2) hi = t2; else lo = t1;
+  }
+  geo_llh_t q; geo_geodesic_interpolate(ellip,a,b,0.5*(lo+hi),opts,&q);
+  return geo_geodesic_inverse(ellip,p,&q,opts,out_d,NULL,NULL);
 }
 
 geo_status_t geo_polygon_area_m2(const geo_llh_t* outer, size_t outer_count,
@@ -63,19 +106,60 @@ geo_status_t geo_polygon_area_m2(const geo_llh_t* outer, size_t outer_count,
     return GEO_OK;
 }
 
+static geo_status_t polygon_contains_local(const geo_ellipsoid_t* ellip,const geo_llh_t* outer,size_t outer_count,
+                                           const geo_llh_t* holes,const size_t* hole_offsets,const size_t* hole_counts,size_t hole_count,
+                                           const geo_llh_t* point,const geo_compute_opts_t* opts,int* out_inside){
+  geo_local_frame_t f;
+  if(geo_local_frame_init(ellip, point, &f) != GEO_OK) return GEO_ERR_PARSE;
+  geo_llh_t* uw_outer = (geo_llh_t*)malloc(sizeof(geo_llh_t) * outer_count);
+  p2_t* outer_xy = (p2_t*)malloc(sizeof(p2_t) * outer_count);
+  if(!uw_outer || !outer_xy){ free(uw_outer); free(outer_xy); return GEO_ERR_PARSE; }
+  unwrap_relative(outer, outer_count, point->lon_deg, uw_outer);
+  for(size_t i=0;i<outer_count;i++){
+    double e,n,u;
+    if(geo_llh_to_enu(&f,&uw_outer[i],&e,&n,&u)!=GEO_OK){ free(uw_outer); free(outer_xy); return GEO_ERR_PARSE; }
+    if(hypot(e,n) > opts->max_local_radius_m){ free(uw_outer); free(outer_xy); return GEO_ERR_UNSUPPORTED; }
+    outer_xy[i]=(p2_t){e,n};
+  }
+  int inside = ring_contains_xy(outer_xy, outer_count, (p2_t){0,0});
+  free(uw_outer); free(outer_xy);
+  if(!inside){ *out_inside = 0; return GEO_OK; }
+  for(size_t h=0; h<hole_count; h++){
+    size_t hc = hole_counts[h];
+    geo_llh_t* uw = (geo_llh_t*)malloc(sizeof(geo_llh_t) * hc);
+    p2_t* xy = (p2_t*)malloc(sizeof(p2_t) * hc);
+    if(!uw || !xy){ free(uw); free(xy); return GEO_ERR_PARSE; }
+    unwrap_relative(holes + hole_offsets[h], hc, point->lon_deg, uw);
+    for(size_t i=0;i<hc;i++){
+      double e,n,u; if(geo_llh_to_enu(&f,&uw[i],&e,&n,&u)!=GEO_OK){ free(uw); free(xy); return GEO_ERR_PARSE; }
+      if(hypot(e,n) > opts->max_local_radius_m){ free(uw); free(xy); return GEO_ERR_UNSUPPORTED; }
+      xy[i]=(p2_t){e,n};
+    }
+    if(ring_contains_xy(xy,hc,(p2_t){0,0})){ free(uw); free(xy); *out_inside=0; return GEO_OK; }
+    free(uw); free(xy);
+  }
+  *out_inside = 1;
+  return GEO_OK;
+}
+
 geo_status_t geo_polygon_contains(const geo_ellipsoid_t* ellip,const geo_llh_t* outer, size_t outer_count,
                                         const geo_llh_t* holes, const size_t* hole_offsets,
                                         const size_t* hole_counts, size_t hole_count,
                                         const geo_llh_t* point, const geo_compute_opts_t* opts, int* out_inside) {
-    (void)ellip; (void)opts;
-    size_t i;
-    if (!outer || !point || !out_inside || outer_count < 3) return GEO_ERR_PARSE;
-    if (!ring_contains(outer, outer_count, point)) { *out_inside = 0; return GEO_OK; }
-    for (i=0;i<hole_count;i++) {
-        if (ring_contains(holes + hole_offsets[i], hole_counts[i], point)) { *out_inside = 0; return GEO_OK; }
-    }
-    *out_inside = 1;
-    return GEO_OK;
+  if (!outer || !point || !out_inside || outer_count < 3) return GEO_ERR_PARSE;
+  geo_compute_opts_t o = nopts(opts);
+  geo_status_t st = GEO_ERR_UNSUPPORTED;
+  if(o.mode==GEO_MODE_LOCAL_TANGENT || o.mode==GEO_MODE_ELLIPSOID){
+    st = polygon_contains_local(ellip, outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, &o, out_inside);
+    if(st==GEO_OK) return GEO_OK;
+    if(!o.allow_fallback) return st;
+    o.mode = GEO_MODE_SPHERE;
+  }
+  if(o.mode==GEO_MODE_SPHERE){
+    geo_compute_opts_t so=o; so.mode=GEO_MODE_SPHERE; so.max_local_radius_m = 1e100;
+    return polygon_contains_local(ellip, outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, &so, out_inside);
+  }
+  return st;
 }
 
 static geo_status_t geo_polygon_distance_to_edge_ex(const geo_ellipsoid_t* ellip,const geo_llh_t* outer, size_t outer_count,
@@ -89,63 +173,79 @@ static geo_status_t geo_polygon_distance_to_edge_ex(const geo_ellipsoid_t* ellip
                                                  geo_llh_t* out_nearest_v2,
                                                  int* out_inside,
                                                  const geo_compute_opts_t* opts,
-                                                         double* out_distance_m) {
-    (void)ellip; (void)opts;
+                                                 double* out_distance_m) {
     size_t i,j;
     double best = 1e300;
     const geo_llh_t* rings[256];
     size_t counts[256];
     size_t ring_n = 0;
-    geo_llh_t best_v1 = {0}, best_v2 = {0};
-    double bd1 = 1e300, bd2 = 1e300;
-    int inside = 0;
-
     if (!outer || !point || !out_distance_m || outer_count < 2) return GEO_ERR_PARSE;
+    geo_compute_opts_t o = nopts(opts);
     rings[ring_n] = outer; counts[ring_n++] = outer_count;
     for (i=0; i<hole_count && ring_n < 256; i++) { rings[ring_n] = holes + hole_offsets[i]; counts[ring_n++] = hole_counts[i]; }
 
-    for (i=0;i<ring_n;i++) {
-        for (j=0;j<counts[i];j++) {
-            geo_llh_t a = rings[i][j];
-            geo_llh_t b = rings[i][(j+1)%counts[i]];
-            p2_t ap = proj(point, &a), bp = proj(point, &b), pp = {0,0};
-            double vx=bp.x-ap.x, vy=bp.y-ap.y;
-            double wx=pp.x-ap.x, wy=pp.y-ap.y;
-            double den=vx*vx+vy*vy;
-            double t= den==0.0?0.0: (wx*vx+wy*vy)/den;
-            p2_t q; double d;
-            if (t < 0.0) t = 0.0; if (t > 1.0) t = 1.0;
-            q.x = ap.x + t*vx; q.y = ap.y + t*vy;
-            d = hypot(q.x-pp.x,q.y-pp.y);
-            if (d < best) {
-                best = d;
-                if (want_nearest_edge_point && out_nearest_edge_point) *out_nearest_edge_point = unproj(point, q);
-            }
+    if(o.mode==GEO_MODE_LOCAL_TANGENT){
+      geo_local_frame_t f; if(geo_local_frame_init(ellip, point, &f)!=GEO_OK) return GEO_ERR_PARSE;
+      for(i=0;i<ring_n;i++){
+        for(j=0;j<counts[i];j++){
+          double e,n,u; if(geo_llh_to_enu(&f,&rings[i][j],&e,&n,&u)!=GEO_OK) return GEO_ERR_PARSE;
+          if(hypot(e,n) > o.max_local_radius_m){
+            if(!o.allow_fallback) return GEO_ERR_UNSUPPORTED;
+            o.mode = GEO_MODE_SPHERE;
+            goto geodesic_mode;
+          }
         }
+      }
+      for(i=0;i<ring_n;i++){
+        geo_llh_t* uw=(geo_llh_t*)malloc(sizeof(geo_llh_t)*counts[i]);
+        if(!uw) return GEO_ERR_PARSE;
+        unwrap_relative(rings[i],counts[i],point->lon_deg,uw);
+        for(j=0;j<counts[i];j++){
+          geo_llh_t a=uw[j], b=uw[(j+1)%counts[i]];
+          p2_t ap=proj(point,&a), bp=proj(point,&b), pp={0,0};
+          double vx=bp.x-ap.x, vy=bp.y-ap.y, den=vx*vx+vy*vy;
+          double t=den==0.0?0.0:((-ap.x)*vx+(-ap.y)*vy)/den;
+          if(t<0)t=0;if(t>1)t=1;
+          p2_t q={ap.x+t*vx,ap.y+t*vy};
+          double d=hypot(q.x,q.y);
+          if(d<best){ best=d; if(want_nearest_edge_point&&out_nearest_edge_point)*out_nearest_edge_point=unproj(point,q); }
+        }
+        free(uw);
+      }
+      if(out_inside){ int inside=0; geo_status_t st=geo_polygon_contains(ellip,outer,outer_count,holes,hole_offsets,hole_counts,hole_count,point,&o,&inside); if(st!=GEO_OK) return st; *out_inside=inside; }
+      *out_distance_m = best; return GEO_OK;
+    }
+
+geodesic_mode:
+    for(i=0;i<ring_n;i++) for(j=0;j<counts[i];j++){
+      const geo_llh_t* a=&rings[i][j]; const geo_llh_t* b=&rings[i][(j+1)%counts[i]];
+      double d; if(point_segment_mode_distance(ellip,point,a,b,&o,&d)!=GEO_OK) return GEO_ERR_UNSUPPORTED;
+      if(d<best) best=d;
     }
 
     if (want_two_nearest_vertices && out_nearest_v1 && out_nearest_v2) {
-        for (i=0;i<outer_count;i++) {
-            double d;
-            geo_status_t st = geo_llh_distance_surface_m(point, &outer[i], &d);
-            if (st != GEO_OK) return st;
-            if (d < bd1) { bd2 = bd1; best_v2 = best_v1; bd1 = d; best_v1 = outer[i]; }
-            else if (d < bd2) { bd2 = d; best_v2 = outer[i]; }
-        }
-        *out_nearest_v1 = best_v1;
-        *out_nearest_v2 = best_v2;
+      double bd1=1e300,bd2=1e300; geo_llh_t v1={0},v2={0};
+      for (i=0;i<outer_count;i++) {
+        double d;
+        geo_status_t st = geo_geodesic_inverse(ellip, point, &outer[i], &o, &d, NULL, NULL);
+        if (st != GEO_OK) return st;
+        if (d < bd1) { bd2 = bd1; v2 = v1; bd1 = d; v1 = outer[i]; }
+        else if (d < bd2) { bd2 = d; v2 = outer[i]; }
+      }
+      *out_nearest_v1 = v1;
+      *out_nearest_v2 = v2;
     }
 
     if (out_inside) {
-        geo_status_t st = geo_polygon_contains(NULL, outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, NULL, &inside);
-        if (st != GEO_OK) return st;
-        *out_inside = inside;
+      int inside=0;
+      geo_status_t st = geo_polygon_contains(ellip, outer, outer_count, holes, hole_offsets, hole_counts, hole_count, point, &o, &inside);
+      if (st != GEO_OK) return st;
+      *out_inside = inside;
     }
-
     *out_distance_m = best;
+    (void)want_nearest_edge_point; (void)out_nearest_edge_point;
     return GEO_OK;
 }
-
 
 geo_status_t geo_polygon_distance_to_edge(const geo_ellipsoid_t* ellip,const geo_llh_t* outer,size_t outer_count,const geo_llh_t* holes,const size_t* hole_offsets,const size_t* hole_counts,size_t hole_count,const geo_llh_t* point,const geo_compute_opts_t* opts,double* out_distance_m){
   return geo_polygon_distance_to_edge_ex(ellip,outer,outer_count,holes,hole_offsets,hole_counts,hole_count,point,0,NULL,0,NULL,NULL,NULL,opts,out_distance_m);
