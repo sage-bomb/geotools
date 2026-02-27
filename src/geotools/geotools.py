@@ -1,6 +1,7 @@
 import os
 import sys
 import ctypes
+import subprocess
 from ctypes import (
     c_int, c_char, c_double, c_size_t, c_char_p, c_uint, c_uint64, c_void_p,
     POINTER, Structure
@@ -42,10 +43,73 @@ def _default_sdk_libpath() -> str:
     return str(Path(__file__).resolve().with_name(_default_sdk_libname()))
 
 
+
+
+def _repo_root_from_module() -> Path | None:
+    cur = Path(__file__).resolve()
+    for parent in cur.parents:
+        if (parent / "csrc").is_dir() and (parent / "include").is_dir():
+            return parent
+    return None
+
+
+def _build_bundled_native_libs(repo: Path, lib_path: Path, sdk_path: Path) -> None:
+    if os.name == "nt":
+        raise RuntimeError("Auto-build is not supported on Windows")
+
+    c_files = sorted((repo / "csrc").rglob("*.c"))
+    if not c_files:
+        raise RuntimeError("No C sources found for geotools native library build")
+
+    include_dirs = [
+        repo / "include",
+        repo / "csrc",
+        repo / "csrc" / "core",
+        repo / "csrc" / "crs",
+        repo / "csrc" / "index",
+        repo / "csrc" / "vector",
+    ]
+
+    lib_path.parent.mkdir(parents=True, exist_ok=True)
+    cc_cmd = ["cc", "-O2", "-fPIC"]
+    cc_cmd += ["-dynamiclib"] if sys.platform == "darwin" else ["-shared"]
+    cc_cmd += [f"-I{inc}" for inc in include_dirs]
+    cc_cmd += [str(c) for c in c_files]
+    cc_cmd += ["-o", str(lib_path), "-lm", "-pthread"]
+    subprocess.check_call(cc_cmd, cwd=repo)
+
+    cpp_files = sorted((repo / "cppsrc").glob("*.cpp"))
+    if not cpp_files:
+        raise RuntimeError("No C++ SDK sources found for geotools SDK build")
+
+    sdk_cmd = ["g++", "-std=c++17", "-O2", "-fPIC"]
+    sdk_cmd += ["-dynamiclib"] if sys.platform == "darwin" else ["-shared"]
+    sdk_cmd += ["-I" + str(repo / "include")]
+    sdk_cmd += [str(c) for c in cpp_files]
+    sdk_cmd += ["-L" + str(lib_path.parent), "-lgeotools"]
+    sdk_cmd += ["-Wl,-rpath,@loader_path"] if sys.platform == "darwin" else ["-Wl,-rpath,$ORIGIN"]
+    sdk_cmd += ["-o", str(sdk_path)]
+    subprocess.check_call(sdk_cmd, cwd=repo)
+
+
+def _ensure_native_libs_present() -> None:
+    lib_path = Path(_default_libpath())
+    sdk_path = Path(_default_sdk_libpath())
+    if lib_path.exists() and sdk_path.exists():
+        return
+
+    repo = _repo_root_from_module()
+    if repo is None:
+        return
+    _build_bundled_native_libs(repo, lib_path, sdk_path)
+
 def load_sdk_library(path: str | None = None) -> ctypes.CDLL | None:
     if path is None:
         path = _default_sdk_libpath()
-    if not Path(path).exists():
+    sdk_path = Path(path)
+    if not sdk_path.exists():
+        _ensure_native_libs_present()
+    if not sdk_path.exists():
         return None
     return ctypes.CDLL(path)
 
@@ -57,6 +121,9 @@ def load_library(path: str | None = None) -> ctypes.CDLL:
     """
     if path is None:
         path = _default_libpath()
+    lib_path = Path(path)
+    if not lib_path.exists():
+        _ensure_native_libs_present()
     return ctypes.CDLL(path)
 
 _lib = load_library()
